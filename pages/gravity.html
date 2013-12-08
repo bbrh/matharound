@@ -1,0 +1,379 @@
+<html>
+<head>
+    <script src="jquery.min.js"></script>
+    <script src="d3.v3.min.js" charset="utf-8"></script>
+
+    <style type="text/css">
+        * { margin:0; padding: 0}
+        menu { position: absolute; top:0px; left:0; background-color: rgb(10, 10, 10); color: #ccc; width:100%;}
+        svg { background-color: black; }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script type="text/javascript">
+
+        Angles = {
+            a : 0,
+            b : 0
+        }
+
+        $(document).ready(function () {
+            var d = Math.floor(Math.min(window.innerHeight, window.innerWidth) / 1.1);
+            Size = { h:d, w:d, d:d, half:Math.floor(d/2) };
+            // pts = gp(10, 0);
+            // pts = sphere(400, Size.d/5);
+            var pts2 = [];
+            pts = solar();
+            // pts  = spiral(new Vector(-1, 1, 0), new Vector(0,Math.PI*1/21,Math.PI*1/21), 333, Size.d/3, '#a44');
+            // pts2 = spiral(new Vector(Math.PI*10/21,0,0),          100, Size.d/3, '#4a4');
+            // pts = sphere(200, Size.d/3, '#4a4');
+            Center = Vector.unit(Size.half);
+            for (var i = pts2.length - 1; i >= 0; i--) {
+                pts.push(pts2[i]);
+            };
+            // pts = generatePoints(10,
+            //     Math.floor(Math.min(Size.w, Size.h)/3),
+            //     { x:Math.floor(Size.w/2), y:Math.floor(Size.h/2) });
+            drawPoints(pts);
+            animation = null;
+            // step();
+            $(document).keyup(function(e) {
+                if (e.which == 32) {
+                    if (animation) {
+                        clearInterval(animation);
+                        animation = 0;
+                    } else
+                        animation = setInterval(step, 1);
+                }
+            });
+            $(document).keydown(function(e) {
+                switch (e.which) {
+                    case (37):
+                        Angles.a = (Angles.a - Math.PI/45) % (2*Math.PI);
+                        if (!animation)
+                            drawPoints(pts);
+                        break;
+                    case (38):
+                        Angles.b = (Angles.b + Math.PI/45) % (2*Math.PI);
+                        if (!animation)
+                            drawPoints(pts);
+                        break;
+                    case (39):
+                        Angles.a = (Angles.a + Math.PI/45) % (2*Math.PI);
+                        if (!animation)
+                            drawPoints(pts);
+                        break;
+                    case (40):
+                        Angles.b = (Angles.b - Math.PI/45) % (2*Math.PI);
+                        if (!animation)
+                            drawPoints(pts);
+                        break;
+                }
+            });
+        });
+
+
+
+        function step () {
+            // var pts = generatePoints(10,
+            //     Math.floor(Math.min(Size.w, Size.h)/3),
+            //     { x:Math.floor(Size.w/2), y:Math.floor(Size.h/2) });
+            counter = 0;
+            while (counter < 100) {
+                pts = updatePoints(pts);
+                counter++;
+            }
+           // if (counter % 1000 === 0) {
+                // console.log('updated');
+                drawPoints(pts);
+        //    }
+        }
+
+        function solar () {
+            function speed (m, r) {
+                return Math.sqrt(m*Gravity.Consts.G/r, 0.5);
+            }
+
+            var pts =  [
+                { coords: Vector.zero(), velocity: Vector.zero(), color: 'red', mass:332837 }
+            ];
+
+            // var masses = [0.1, 0.8, 1, 0.7, 100, 80, 10, 10, .01];
+            var masses = [
+                { m:0.0553, d:0.387 },
+                { m:0.815,  d:0.723 },
+                { m:1,      d:1.000 },
+                { m:0.107,  d:1.524 },
+                { m:317.83, d:5.203 },
+                { m:95.159, d:9.537 },
+                { m:14.536, d:19.19 },
+                { m:17.147, d:30.07 },
+                { m:0.0022, d:39.48 }
+            ];
+
+            var i = 0;
+            var amt = masses.length;
+            while (i<amt) {
+                var r = masses[i].d/50 * Size.half;
+                var angle = Math.random()*Math.PI*2;
+                pts.push({
+                    coords   : new Vector(r, 0, 0).rotz(angle),
+                    velocity : new Vector(0, speed(pts[0].mass, r*Gravity.Consts.space), 0).rotz(angle),
+                    color    : 'green',
+                    mass     : masses[i].m
+                });
+                i++;
+            }
+            console.log(pts);
+            return pts;
+        }
+
+        function spiral (initv, rot, amt, r, color) {
+            return cloud(initv, rot, amt, r, color, 0.1);
+        }
+
+        function sphere (initv, amt, r, color) {
+            return cloud(initv, Vector.zero(), amt, r, color, 1);
+        }
+
+        function cloud (initv, rot, amt, r, color, zwidth) {
+            var points = [];
+            for (var i=0; i<amt; i++) {
+                var angle = Math.PI*2*Math.random();
+                var angle2 = Math.PI*2*Math.random();
+                var rad = Math.random()*r;
+                var position = new Vector(
+                        rad*Math.cos(angle),
+                        rad*Math.sin(angle),
+                        Math.sqrt(r*r - rad*rad)*Math.cos(angle2)*zwidth
+                    );
+                position = position.rotate(rot);
+                var velocity = new Vector(initv.x*Math.sin(angle), initv.y*Math.cos(angle), initv.z*0).rotate(rot);
+                points.push({
+                    coords   : position,
+                    velocity : velocity,
+                    mass     : 1,
+                    color    : color ? color : 'white'
+                });
+            }
+            return points;
+        }
+
+        function gp (density, variations) {
+            var points = [];
+
+            var pX = Math.floor(Math.min(Size.w, Size.h) / density);
+            //var pY = Math.floor(Math.min(Size.w, Size.h) / density);
+
+            for (var i=0; i<density; i++) {
+                for (var j=0; j<density; j++) {
+                    for (var k=0; k<density; k++) {
+                        var x = (i+1)*pX + Math.random()*pX*variations;
+                        var y = (j+1)*pX + Math.random()*pX*variations;
+                        var z = (k+1)*pX + Math.random()*pX*variations;
+                        var vx = (Math.random()-.5)*1e-1;
+                        var vy = (Math.random()-.5)*1e-1;
+                        var vz = (Math.random()-.5)*1e-1;
+                        points.push({
+                            coords   : new Vector(x, y, z),
+                            velocity : new Vector(vx, vy, vz),
+                            mass     : Math.random()*2
+                        })
+                    }
+                }
+            }
+            return points;
+        };
+
+        // function generatePoints (amt, r, center) {
+        //     var points = [];
+
+        //     for (var i=0; i<amt; i++) {
+        //         var x = Math.floor((Math.random() - 0.5) * r);
+        //         var y = Math.floor((Math.random() - 0.5) * r);
+        //         var z = Math.floor((Math.random() - 0.5) * r);
+        //         var vx = 0; //Math.floor((Math.random() - 0.5) * r) / 1e2;
+        //         var vy = 0; //Math.floor((Math.random() - 0.5) * r) / 1e2;
+        //         var vz = 0; //Math.floor((Math.random() - 0.5) * r) / 1e2;
+        //         points.push({
+        //             coords   : new Vector(center.x + x, center.y + y, center.z + z),
+        //             velocity : new Vector(vx, vy, vz),
+        //             mass     : 1
+        //         })
+        //     }
+        //     return points;
+        // };
+
+        function updatePoints (points) {
+            // var start = points.length;
+            // $.each(points, function(i, a) {
+            //     $.each(points, function(j, b) {
+            //         if (i !== j && a && b && Gravity.collision(a.coords, b.coords)) {
+            //             // points[i] = {
+            //             //     coords   : a.coords.clone(),
+            //             //     mass     : a.mass + b.mass,
+            //             //     velocity : new Vector(
+            //             //         (a.velocity.x*a.mass + b.velocity.x*b.mass)/(a.mass + b.mass),
+            //             //         (a.velocity.y*a.mass + b.velocity.y*b.mass)/(a.mass + b.mass),
+            //             //         (a.velocity.z*a.mass + b.velocity.z*b.mass)/(a.mass + b.mass)
+            //             //     )
+            //             // };
+            //             // points.splice(j, 1);
+            //             // console.log('collision', i, j, points[i]);
+            //         }
+            //     });
+            // });
+            // if (points.length < start) {
+            //     // console.log(start, '-->', points.length);
+            // }
+
+            for (var i = points.length - 1; i >= 0; i--) {
+                for (var j = points.length - 1; j >= 0; j--) {
+                    var item = points[i];
+                    if (i!==j)
+                        item.velocity = item.velocity.sum(Gravity.force(item, points[j]));
+                }
+            };
+
+            // $.each(points, function(i, item) {
+            //     $.each(points, function(j, jtem) {
+            //         if (i!==j) item.velocity = item.velocity.sum(Gravity.force(item, jtem));
+            //     })
+            // });
+
+            return $.map(points, function(item, i) {
+                item.coords.x += item.velocity.x;
+                item.coords.y += item.velocity.y
+                item.coords.z += item.velocity.z
+                return item;
+            });
+        }
+
+        function up2(points) {
+
+            var i = 0;
+            for (var j = points.length - 1; j > 0; j--) {
+                var item = points[i];
+                item.velocity = item.velocity.sum(Gravity.force(item, points[j]));
+            }
+
+            return $.map(points, function(item, i) {
+                item.coords.x += item.velocity.x;
+                item.coords.y += item.velocity.y
+                item.coords.z += item.velocity.z
+                return item;
+            });
+        }
+
+        function drawPoints (points) {
+            $('#container').empty();
+
+            var svg = d3.select("div")
+                .append("svg")
+                .attr('height', Size.h)
+                .attr('width', Size.w);
+
+            var points2 = $.map(points, function(p, i) {
+                return {
+                    coords: p.coords.rotate(new Vector(Angles.b, Angles.a, 0)).sum(Center),
+                    velocity: p.velocity,
+                    mass: p.mass,
+                    color: p.color
+                };
+            });
+
+            var circles = svg.selectAll('circle')
+                .data(points2)
+                .enter()
+                .append('circle')
+                .attr('cx',   function(d) { return d.coords.x; })
+                .attr('cy',   function(d) { return d.coords.y; })
+                .attr('fill', function(d) { return d.color; })
+                .attr('r', 1);
+        };
+
+        Gravity = {
+            force: function (a, b) {
+                var R = a.coords.dist(b.coords);
+                var rhat = b.coords.diff(a.coords);
+                return rhat.mult( b.mass * Math.pow(R, -3) / Gravity.Consts.space );
+                // return rhat.mult(Gravity.Consts.G*b.mass / Math.pow(R, 3) / Gravity.Consts.space);
+            },
+            collision: function (a, b) {
+                return a.dist(b.coords) < 10;
+            },
+            Consts: {
+                G     : 1,
+                space : 149597890
+            }
+        }
+
+        Vector = function (x,y,z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        Vector.zero = function () {
+            return new Vector(0,0,0);
+        }
+
+        Vector.unit = function (a) {
+            return new Vector(a,a,a);
+        }
+
+        Vector.prototype.clone = function() {
+            return new Vector(this.x, this.y, this.z);
+        };
+
+        Vector.prototype.dist = function(other) {
+            return this.diff(other).length();
+            //return Math.pow(Math.pow(this.x-other.x, 2) + Math.pow(this.y-other.y, 2) + Math.pow(this.z-other.z, 2), 0.5);
+        };
+
+        Vector.prototype.length = function() {
+            return Math.pow(this.x*this.x+this.y*this.y+this.z*this.z, 0.5);
+        }
+
+        Vector.prototype.sum = function(other) {
+            return new Vector (this.x + other.x, this.y + other.y, this.z + other.z);
+        };
+
+        Vector.prototype.diff = function(other) {
+            return new Vector (this.x - other.x, this.y - other.y, this.z - other.z);
+        };
+
+        Vector.prototype.mult = function(a) {
+            return new Vector (this.x*a, this.y*a, this.z*a);
+        };
+
+        Vector.prototype.dotProd = function(other) {
+            return this.x*other.x + this.y*other.y + this.z*other.z;
+        };
+
+        Vector.prototype.rotate = function(rotVector) {
+            return this.rotx(rotVector.x).roty(rotVector.y).rotz(rotVector.z);
+        }
+
+        Vector.prototype.rotx = function(theta) {
+            var ct = Math.cos(theta);
+            var st = Math.sin(theta);
+            return new Vector(this.x, this.y*ct - this.z*st, this.y*st + this.z*ct);
+        };
+
+        Vector.prototype.roty = function(theta) {
+            var ct = Math.cos(theta);
+            var st = Math.sin(theta);
+            return new Vector(this.x*ct + this.z*st, this.y, this.z*ct - this.x*st);
+        };
+
+        Vector.prototype.rotz = function(theta) {
+            var ct = Math.cos(theta);
+            var st = Math.sin(theta);
+            return new Vector(this.x*ct - this.y*st, this.x*st + this.y*ct, this.z);
+        };
+
+    </script>
+</body>
+</html>
