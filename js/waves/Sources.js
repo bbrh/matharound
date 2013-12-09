@@ -1,5 +1,6 @@
 Sources = function (svgcontainer, field) {
   this.field = field;
+  this.objectPlaceholder = svgcontainer;
   this.svg = d3.select(svgcontainer).append('svg')
     .attr('height', Size.h)
     .attr('width',  Size.w);
@@ -7,16 +8,16 @@ Sources = function (svgcontainer, field) {
     0 : { 
       x          : Math.floor(Size.w/5),
       y          : Math.floor(Size.h/3),
-      wavelength : 10,
+      wavelength : 20,
       amplitude  : 10,
       id         : 0,
       fill       : 'green'
-    }, 2 : {
+    }, 1 : {
       x          : Math.floor(Size.w/5),
       y          : Math.floor(Size.h*2/3),
-      wavelength : 9,
+      wavelength : 20,
       amplitude  : 8,
-      id         : 2,
+      id         : 1,
       fill       : 'yellow'
     },
   };
@@ -61,3 +62,25 @@ Sources.prototype.draw = function () {
       return;
     }).call(drag);
 };
+
+Sources.prototype.cleanup = function () {
+  $(this.objectPlaceholder).empty();
+};
+
+Sources.prototype.addNewSource = function () {
+  var id = (Object.keys(this.data)).length;
+  var news = Sources.newSource(id);
+  this.data[id] = news;
+  console.log(news);
+}
+
+Sources.newSource = function (id) {
+  return {
+      x          : Math.floor(Size.w * (0.8 * Math.random() + 0.1)),
+      y          : Math.floor(Size.h * (0.8 * Math.random() + 0.1)),
+      wavelength : 2,
+      amplitude  : 8,
+      id         : id,
+      fill       : 'orange'
+    };
+}

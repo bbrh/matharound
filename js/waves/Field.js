@@ -1,6 +1,7 @@
 Field = function(objectPlaceholder) {
   this.objectPlaceholder = objectPlaceholder;
-  var canvasPlaceholder = $('<div>', {class:'canvas-placeholder'}).appendTo(objectPlaceholder);
+  var canvasPlaceholder =
+    $('<div>', {class:'canvas-placeholder'}).appendTo(objectPlaceholder);
   this.canvas = new Canvas(canvasPlaceholder);
 
 }
@@ -25,7 +26,9 @@ Field.prototype.waveFun = function(sources, point) {
   for (var si in sources) {
     maxAmp += sources[si].amplitude;
     res += sources[si].amplitude *
-      (1+Math.cos(Field.distance(point, sources[si]) / Size.w*sources[si].wavelength*Math.PI));
+      (1+Math.cos(
+        Field.distance(point, sources[si]) / 
+        Size.w*sources[si].wavelength*Math.PI));
   }
 
   return Math.floor(128 * res / maxAmp);
@@ -36,3 +39,7 @@ Field.distance = function(a, b) {
   var dy = a.y - b.y;
   return Math.pow(da*da + dy*dy, 0.5);
 }
+
+Field.prototype.cleanup = function () {
+  this.objectPlaceholder.empty();
+};

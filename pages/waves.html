@@ -3,25 +3,30 @@
     <title>matharound - waves</title>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="/matharound/css/ma.css">
-    <script src="/matharound/js/libs/jquery.min.js"></script>
-    <script src="/matharound/js/libs/d3.v3.min.js"></script>
+    <link rel="stylesheet" href="/css/ma.css">
+    <script src="/js/libs/jquery.min.js"></script>
+    <script src="/js/libs/d3.v3.min.js"></script>
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
-    <script src="/matharound/js/libs/jquery.history.js"></script>
-    <script src="/matharound/js/Utils.js"></script>
-    <script src="/matharound/js/Canvas.js"></script>
-    <script src="/matharound/js/waves/Sources.js"></script>
-    <script src="/matharound/js/waves/Field.js"></script>
+    <script src="/js/libs/jquery.history.js"></script>
+    <script src="/js/Utils.js"></script>
+    <script src="/js/Canvas.js"></script>
+    <script src="/js/waves/Sources.js"></script>
+    <script src="/js/waves/Field.js"></script>
 </head>
 <body>
     <div class="content">
         <header class="header">
-            <h1 class="page-header1"><a href="/matharound/index.html">Matharound</a></h1>
+            <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
 
             <div style="display:table-row">
                 <h2 class="page-subheader" style="display:table-cell;  white-space: nowrap;">
                     Harmonic oscillators in 2d
                 </h2>
+
+                <div style="display:table-cell; text-align:right;">
+                    <button class="btn btn-default sources-add" type="button">
+                        <span class="glyphicon glyphicon-arrow-up"></span>Add</button>
+                </div>
             </div>
 
         </header>
@@ -34,11 +39,38 @@
         <script type="text/javascript">
             $(document).ready(function() {
                 Size = Utils.getSize();
-                var field = new Field($('.canvas-container'));
-                var sources = new Sources('.svg-container', field);
-                sources.draw();
-                field.draw(sources.data);
+                Controls = {
+                    sourcesAdd : $('.sources-add')
+                };
+
+                Controls.sourcesAdd.click(addSource);
+
+                ScalarField = new Field($('.canvas-container'));
+                WaveSources = new Sources('.svg-container', ScalarField);
+
+                $(window).on('resize', resize);
+                display();
             })
+
+            function addSource() {
+                WaveSources.addNewSource();
+                display();
+            }
+
+            function resize() {
+                var data = WaveSources.data;
+                Size = Utils.getSize();
+                WaveSources.cleanup();
+                ScalarField.cleanup();
+                ScalarField = new Field($('.canvas-container'));
+                WaveSources = new Sources('.svg-container', ScalarField);
+                display();
+            }
+
+            function display() {
+                WaveSources.draw();
+                ScalarField.draw(WaveSources.data);
+            }
         </script>
     </div>
 
