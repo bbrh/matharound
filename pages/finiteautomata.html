@@ -94,10 +94,7 @@
             Size = Utils.getSize();
             // History.Adapter.bind(window, 'statechange', openpage);
             // History.Adapter.bind(window, 'hashchange', openpage);
-            $(window).on('hashchange', function() {
-                _gaq.push(['_trackPageview',location.pathname + location.search  + location.hash]);
-                openpage();
-            });
+            $(window).on('hashchange', openpage);
             $(window).on('resize', resize);
 
             FA = new FiniteAutomata(Controls.container, Controls.menu);
@@ -196,6 +193,7 @@
         }
 
         function openpage () {
+            _gaq.push(['_trackPageview',location.pathname + location.search  + location.hash]);
             var state = History.getState();
             FA.display(state.data);
         };
