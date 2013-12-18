@@ -1,0 +1,178 @@
+<html>
+<head>
+    <title>matharound - waves</title>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/ma.css">
+    <script src="/js/libs/jquery.min.js"></script>
+    <script src="/js/libs/d3.v3.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script src="/js/libs/jquery.history.js"></script>
+    <script src="/js/Utils.js"></script>
+    <script src="/js/Canvas.js"></script>
+    <script src="/js/waves/Sources.js"></script>
+    <script src="/js/waves/Field.js"></script>
+    <script src="/js/GAnalytics.js"></script>
+</head>
+<body>
+    <div class="content">
+        <header class="header">
+            <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
+
+            <div style="display:table-row">
+                <h2 class="page-subheader" style="display:table-cell;  white-space: nowrap;">
+                    Interference
+                </h2>
+
+                <div style="display:table-cell; text-align:right;">
+                    <div class="row col-sm-5"></div>
+                    <div class="row col-sm-1">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default sources-add" type="button">
+                                <span class="glyphicon glyphicon-plus"></span></button>
+                            <button class="btn btn-default sources-edit" data-toggle="button" type="button">
+                                <span class="glyphicon glyphicon-wrench"></span></button>
+                        </div>
+                    </div>
+                    <div class="row col-sm-2">
+                        <div class="input-group input-group-sm">
+                          <span class="input-group-addon">Amplitude</span>
+                          <input type="text" class="form-control sources-amplitude" style="min-width:4em;" value="10" />
+                        </div><!-- /input-group -->
+                    </div>
+                    <div class="row col-sm-2">
+                        <div class="input-group input-group-sm">
+                          <span class="input-group-addon">Wavelength</span>
+                          <input type="text" class="form-control sources-wavelength" style="min-width:4em;" value="100" />
+                        </div><!-- /input-group -->
+                    </div>
+                    <div class="row col-sm-3">
+                        <div class="input-group input-group-sm">
+                          <span class="input-group-addon">Sources</span>
+                          <input type="text" class="form-control num-of-sources" style="min-width:4em;" value="5" />
+                          <div class="input-group-btn">
+                            <button class="btn btn-default num-of-sources-prev" type="button">
+                                <span class="glyphicon glyphicon-arrow-down"></span><!-- Prev --></button>
+                            <button class="btn btn-default num-of-sources-next" type="button">
+                                <span class="glyphicon glyphicon-arrow-up"></span><!-- Next --></button>
+                          </div>
+                        </div><!-- /input-group -->
+                    </div>
+                </div>
+            </div>
+
+        </header>
+
+        <div class="wrap">
+            <div class="svg-container" style="position:absolute;"></div>
+            <div class="canvas-container"></div>
+        </div>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                Size = Utils.getSize();
+                Controls = {
+                    sourcesAdd       : $('.sources-add'),
+                    sourcesEdit      : $('.sources-edit'),
+                    numOfSources     : $('.num-of-sources'),
+                    numOfSourcesNext : $('.num-of-sources-next'),
+                    numOfSourcesPrev : $('.num-of-sources-prev'),
+                    amplitude        : $('.sources-amplitude'),
+                    wavelength       : $('.sources-wavelength'),
+                };
+                SelectedNode = null;
+
+                update();
+
+                Controls.sourcesAdd.click(addSource);
+                Controls.sourcesEdit.click(displayControls);
+                Controls.numOfSources.change(update);
+                Controls.numOfSourcesPrev.click(function() {
+                    var z = parseInt(Controls.numOfSources.val(), 10);
+                    Controls.numOfSources.val(z-1);
+                    Controls.numOfSources.change();
+                });
+                Controls.numOfSourcesNext.click(function() {
+                    var z = parseInt(Controls.numOfSources.val(), 10);
+                    Controls.numOfSources.val(z+1);
+                    Controls.numOfSources.change();
+                });
+                Controls.amplitude.change(update);
+                Controls.wavelength.change(update);
+
+                $(window).on('resize', resize);
+            });
+
+            function update() {
+                $('.canvas-container').empty();
+                $('.svg-container').empty();
+
+                var numOfSources = parseInt(Controls.numOfSources.val(), 10);
+                var amplitude = parseInt(Controls.amplitude.val(), 10);
+                var wavelength = parseInt(Controls.wavelength.val(), 10);
+                if (numOfSources < 2) numOfSources = 0;
+                if (numOfSources > 50) numOfSources = 50;
+
+                var srcs = {};
+                var xStep = Math.floor(Size.w/(numOfSources*50+1));
+                var yStep = Math.floor(Size.h/(numOfSources+1));
+                var xMar = Math.floor(Size.w/20);
+
+                for (var i=0; i<numOfSources; i++) {
+                    srcs[i] = {
+                        x          : xMar+xStep*i, y          : yStep*(i+1),
+                        wavelength : wavelength,   amplitude  : amplitude,
+                        id         : i,            fill       : 'blue',
+                        rad        : 5
+                    }
+                }
+
+                ScalarField = new Field($('.canvas-container'));
+                WaveSources = new Sources('.svg-container', ScalarField, srcs);
+
+                display();
+            }
+
+            function displayControls() {
+                if (WaveSources.isDrawControls)
+                    WaveSources.updateField();
+                WaveSources.isDrawControls = !WaveSources.isDrawControls;
+                WaveSources.draw();
+            }
+
+            function addSource() {
+                WaveSources.addNewSource();
+                display();
+            }
+
+            function resize() {
+                var data = WaveSources.data;
+                Size = Utils.getSize();
+                WaveSources.cleanup();
+                ScalarField.cleanup();
+                ScalarField = new Field($('.canvas-container'));
+                WaveSources = new Sources('.svg-container', ScalarField, data);
+                display();
+            }
+
+            function display() {
+                WaveSources.draw();
+                ScalarField.draw(WaveSources.data);
+            }
+        </script>
+    </div>
+
+    <footer class="footer">
+        <div class="col-sm-6 footer-column">
+            <p class="text-left">Updates on twttr</p>
+            <p class="text-left">Made by me</p>
+        </div>
+        <div class="col-sm-6 footer-column">
+            <p class="text-right">Available on GitHub</p>
+        </div>
+    </footer>
+</body>
+</html>
+
+
+
