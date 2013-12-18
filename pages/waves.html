@@ -26,7 +26,9 @@
 
                 <div style="display:table-cell; text-align:right;">
                     <button class="btn btn-default sources-add" type="button">
-                        <span class="glyphicon glyphicon-arrow-up"></span>Add</button>
+                        <span class="glyphicon glyphicon-plus"></span></button>
+                    <button type="button" class="btn sources-edit" data-toggle="button">
+                        <span class="glyphicon glyphicon-wrench"></span></button>
                 </div>
             </div>
 
@@ -41,17 +43,27 @@
             $(document).ready(function() {
                 Size = Utils.getSize();
                 Controls = {
-                    sourcesAdd : $('.sources-add')
+                    sourcesAdd  : $('.sources-add'),
+                    sourcesEdit : $('.sources-edit')
                 };
-
-                Controls.sourcesAdd.click(addSource);
+                SelectedNode = null;
 
                 ScalarField = new Field($('.canvas-container'));
                 WaveSources = new Sources('.svg-container', ScalarField);
 
+                Controls.sourcesAdd.click(addSource);
+                Controls.sourcesEdit.click(displayControls);
+
                 $(window).on('resize', resize);
                 display();
-            })
+            });
+
+            function displayControls() {
+                if (WaveSources.isDrawControls)
+                    WaveSources.updateField();
+                WaveSources.isDrawControls = !WaveSources.isDrawControls;
+                WaveSources.draw();
+            }
 
             function addSource() {
                 WaveSources.addNewSource();
@@ -86,3 +98,4 @@
     </footer>
 </body>
 </html>
+
