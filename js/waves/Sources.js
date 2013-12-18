@@ -1,13 +1,13 @@
 /*global Sources:true, d3, Size */
 
-Sources = function (svgcontainer, field) {
+Sources = function (svgcontainer, field, data) {
   this.field = field;
   this.isDrawControls = false;
   this.objectPlaceholder = svgcontainer;
   this.svg = d3.select(svgcontainer).append('svg')
     .attr('height', Size.h)
     .attr('width',  Size.w);
-  this.data = {
+  this.data = data || {
     0 : {
       x          : Math.floor(Size.w/5),
       y          : Math.floor(Size.h/3),
