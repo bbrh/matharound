@@ -105,3 +105,18 @@ a, a:hover {
 .draggable {
     cursor: move;
 }
+
+.draggable-horizontal {
+    cursor: ew-resize;
+}
+
+.draggable-vertical {
+    cursor: ns-resize;
+}
+
+.control-element-group {
+    float: right;
+    text-align: left;
+    min-width: 5em;
+    margin-right: 1em;
+}
