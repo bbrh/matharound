@@ -25,39 +25,30 @@
                 </h2>
 
                 <div style="display:table-cell; text-align:right;">
-                    <div class="row col-sm-5"></div>
-                    <div class="row col-sm-1">
-                        <div class="input-group-btn">
-                            <button class="btn btn-default sources-add" type="button">
-                                <span class="glyphicon glyphicon-plus"></span></button>
-                            <button class="btn btn-default sources-edit" data-toggle="button" type="button">
-                                <span class="glyphicon glyphicon-wrench"></span></button>
-                        </div>
+                    <div class="control-element-group input-group-btn">
+                        <button class="btn btn-default sources-add" type="button">
+                            <span class="glyphicon glyphicon-plus"></span></button>
+                        <button class="btn btn-default sources-edit" data-toggle="button" type="button">
+                            <span class="glyphicon glyphicon-wrench"></span></button>
                     </div>
-                    <div class="row col-sm-2">
-                        <div class="input-group input-group-sm">
-                          <span class="input-group-addon">Amplitude</span>
-                          <input type="text" class="form-control sources-amplitude" style="min-width:4em;" value="10" />
-                        </div><!-- /input-group -->
-                    </div>
-                    <div class="row col-sm-2">
-                        <div class="input-group input-group-sm">
-                          <span class="input-group-addon">Wavelength</span>
-                          <input type="text" class="form-control sources-wavelength" style="min-width:4em;" value="100" />
-                        </div><!-- /input-group -->
-                    </div>
-                    <div class="row col-sm-3">
-                        <div class="input-group input-group-sm">
-                          <span class="input-group-addon">Sources</span>
-                          <input type="text" class="form-control num-of-sources" style="min-width:4em;" value="5" />
-                          <div class="input-group-btn">
-                            <button class="btn btn-default num-of-sources-prev" type="button">
-                                <span class="glyphicon glyphicon-arrow-down"></span><!-- Prev --></button>
-                            <button class="btn btn-default num-of-sources-next" type="button">
-                                <span class="glyphicon glyphicon-arrow-up"></span><!-- Next --></button>
-                          </div>
-                        </div><!-- /input-group -->
-                    </div>
+                    <div class="control-element-group input-group input-group-sm">
+                      <span class="input-group-addon" style="width:5em;">Amplitude</span>
+                      <input type="text" class="form-control sources-amplitude" style="width:4em;" value="10" />
+                    </div><!-- /input-group -->
+                    <div class="control-element-group input-group input-group-sm">
+                      <span class="input-group-addon" style="width:6em;">Wavelength</span>
+                      <input type="text" class="form-control sources-wavelength" style="width:4em" value="100" />
+                    </div><!-- /input-group -->
+                    <div class="control-element-group input-group input-group-sm" style="min-width:10em;">
+                      <span class="input-group-addon" style="">Sources</span>
+                      <input type="text" class="form-control num-of-sources" style="width:4em" value="5" />
+                      <div class="input-group-btn">
+                        <button class="btn btn-default num-of-sources-prev" type="button">
+                            <span class="glyphicon glyphicon-arrow-down"></span><!-- Prev --></button>
+                        <button class="btn btn-default num-of-sources-next" type="button">
+                            <span class="glyphicon glyphicon-arrow-up"></span><!-- Next --></button>
+                      </div>
+                    </div><!-- /input-group -->
                 </div>
             </div>
 
@@ -108,13 +99,15 @@
                 $('.svg-container').empty();
 
                 var numOfSources = parseInt(Controls.numOfSources.val(), 10);
-                var amplitude = parseInt(Controls.amplitude.val(), 10);
-                var wavelength = parseInt(Controls.wavelength.val(), 10);
-                if (numOfSources < 2) numOfSources = 0;
+                var amplitude = parseFloat(Controls.amplitude.val());
+                var wavelength = parseFloat(Controls.wavelength.val());
+                if (numOfSources < 2) numOfSources = 2;
                 if (numOfSources > 50) numOfSources = 50;
 
+                Controls.numOfSources.val(numOfSources);
+
                 var srcs = {};
-                var xStep = Math.floor(Size.w/(numOfSources*50+1));
+                var xStep = 0; // Math.floor(Size.w/(numOfSources*50+1));
                 var yStep = Math.floor(Size.h/(numOfSources+1));
                 var xMar = Math.floor(Size.w/20);
 
@@ -123,7 +116,8 @@
                         x          : xMar+xStep*i, y          : yStep*(i+1),
                         wavelength : wavelength,   amplitude  : amplitude,
                         id         : i,            fill       : 'blue',
-                        rad        : 5
+                        rad        : 5,            fill2      : 'lightblue',
+                        strokewidth: 2
                     }
                 }
 
@@ -173,6 +167,3 @@
     </footer>
 </body>
 </html>
-
-
-
