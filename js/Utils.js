@@ -1,10 +1,15 @@
+/*global Utils:true*/
+
 Utils = {};
 
 Utils.getSize = function () {
-    return {
-    	h : window.innerHeight 
-    		- $('.header').outerHeight()
-    		- $('.footer').outerHeight(),
-    	w : window.innerWidth
-    };
+  var h = window.innerHeight -
+    $('.header').outerHeight() -
+    $('.footer').outerHeight();
+  var w = window.innerWidth;
+  return {
+    m : Math.min(h, w),
+    h : h,
+    w : w
+  };
 };
