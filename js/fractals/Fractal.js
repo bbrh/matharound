@@ -33,10 +33,10 @@ Fractal.prototype.iterate = function(steps) {
 
 Fractal.lineSegmentFun = d3.svg.line()
   .x( function (d) {
-    return d.x * Size.w;
+    return d.x * Size.m + (Size.w - Size.m) / 2;
   })
   .y( function (d) {
-    return d.y * Size.h;
+    return d.y * Size.m + (Size.h - Size.m) / 2;
   })
   .interpolate('linear');
 
@@ -70,16 +70,16 @@ Fractal.iterators = {
 
       newD.push({ x: d.x, y: d.y });
       newD.push({
-        x: d.x + half.x - half.x * (1 - this.height),
-        y: d.y + half.y - half.y * (1 - this.height),
+        x: d.x + half.x - half.x * (1 - this.opts.height),
+        y: d.y + half.y - half.y * (1 - this.opts.height),
       });
       newD.push({
-        x: d.x + half.x + half.y * this.height,
-        y: d.y + half.y - half.x * this.height,
+        x: d.x + half.x + half.y * this.opts.height,
+        y: d.y + half.y - half.x * this.opts.height,
       });
       newD.push({
-        x: e.x - half.x + half.x * (1 - this.height),
-        y: e.y - half.y + half.y * (1 - this.height),
+        x: e.x - half.x + half.x * (1 - this.opts.height),
+        y: e.y - half.y + half.y * (1 - this.opts.height),
       });
     }
     newD.push({
