@@ -1,0 +1,68 @@
+<html>
+<head>
+    <title>matharound - fractals</title>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="file:///C:/dev/ma/matharound-master/css/ma.css">
+    <script src="file:///C:/dev/ma/matharound-master/js/libs/jquery.min.js"></script>
+    <script src="file:///C:/dev/ma/matharound-master/js/libs/d3.v3.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script src="file:///C:/dev/ma/matharound-master/js/Utils.js"></script>
+    <script src="file:///C:/dev/ma/matharound-master/js/fractals/Fractal.js"></script>
+</head>
+<body>
+    <div class="content">
+        <header class="header">
+            <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
+
+            <div style="display:table-row">
+                <h2 class="page-subheader" style="display:table-cell;  white-space: nowrap;">
+                    Koch Snowflake
+                </h2>
+            </div>
+
+        </header>
+
+        <div class="wrap">
+            <div class="svg-container" style="position:absolute;"></div>
+        </div>
+
+        <script type="text/javascript">
+        $(document).ready(function() {
+          Size = Utils.getSize();
+          Iterations = 6;
+
+          Svg = d3.select('.svg-container').append('svg')
+            .attr('id', 'svg')
+            .attr('height', Size.h-2)
+            .attr('width',  Size.w-2);
+
+          KS = new Cesaro(Svg, Fractal.init.ngram(4, 0.5, 0), { height:0.9 });
+          KS.iterate(Iterations).draw();
+
+          $(window).on('resize', resize);
+        });
+
+        function resize() {
+          Size = Utils.getSize();
+          update();
+        }
+
+        function update() {
+          KS.clear();
+          KS.iterate(Iterations).draw();
+        }
+        </script>
+    </div>
+
+    <footer class="footer">
+        <div class="col-sm-6 footer-column">
+            <p class="text-left">Updates on twttr</p>
+            <p class="text-left">Made by me</p>
+        </div>
+        <div class="col-sm-6 footer-column">
+            <p class="text-right">Available on GitHub</p>
+        </div>
+    </footer>
+</body>
+</html>
