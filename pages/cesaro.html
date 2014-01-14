@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/css/ma.css">
     <script src="/js/libs/jquery.min.js"></script>
     <script src="/js/libs/d3.v3.min.js"></script>
+    <script src="/js/libs/jquery.history.js"></script>
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
     <script src="/js/Utils.js"></script>
     <script src="/js/fractals/Fractal.js"></script>
@@ -19,6 +20,32 @@
                 <h2 class="page-subheader" style="display:table-cell;  white-space: nowrap;">
                     Cesaro (Torn Square)
                 </h2>
+                
+                <div class="row col-sm-3">
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-addon">Torn</span>
+                      <input type="text" class="form-control torn-amt" style="min-width:5em;" value="0.95" />
+                      <div class="input-group-btn">
+                        <button class="btn btn-default torn-prev" type="button">
+                            <span class="glyphicon glyphicon-arrow-down"></span><!-- Prev --></button>
+                        <button class="btn btn-default torn-next" type="button">
+                            <span class="glyphicon glyphicon-arrow-up"></span><!-- Next --></button>
+                      </div>
+                    </div><!-- /input-group -->
+                </div>
+
+                <div class="row col-sm-3">
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-addon">Iterations</span>
+                      <input type="text" class="form-control iters-amt" style="min-width:4em;" value="6" />
+                      <div class="input-group-btn">
+                        <button class="btn btn-default iters-prev" type="button">
+                            <span class="glyphicon glyphicon-arrow-down"></span><!-- Prev --></button>
+                        <button class="btn btn-default iters-next" type="button">
+                            <span class="glyphicon glyphicon-arrow-up"></span><!-- Next --></button>
+                      </div>
+                    </div><!-- /input-group -->
+                </div>
             </div>
 
         </header>
@@ -28,29 +55,125 @@
         </div>
 
         <script type="text/javascript">
+        Settings = {
+          tornStep    : 0.025,
+          startTorn   : 0.95,
+          startIters  : 6,
+          precision   : 1e3,
+        };
+
+        function updateHash() {
+          var torn = parseFloat(Controls.tornamt.val());
+          var iters = parseInt(Controls.itersamt.val(), 10);
+
+          iters = Math.min(Math.max(iters, 0), 10);
+
+          History.replaceState({
+              torn: torn, iterations: iters
+          }, '', '?'+torn+'|'+iters);
+          openpage();
+        }
+
+        function openpage () {
+          //ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
+          var state = History.getState();
+          KS.opts.height = state.data.torn;
+          KS.display(state.data.iterations)
+        };
+
         $(document).ready(function() {
+
+
+          Controls = {
+            tornamt  : $('.torn-amt'),
+            nexttorn : $('.torn-next'),
+            prevtorn : $('.torn-prev'),
+
+            itersamt  : $('.iters-amt'),
+            nextiters : $('.iters-next'),
+            previters : $('.iters-prev'),
+          };
+
+
+          Controls.tornamt.change(function() {
+            updateHash();
+          });
+
+          Controls.nexttorn.click(function() {
+            var z = parseFloat(Controls.tornamt.val());
+            Controls.tornamt.val(Math.round(
+                (z+Settings.tornStep)*Settings.precision)/Settings.precision
+            );
+            Controls.tornamt.change();
+          });
+
+          Controls.prevtorn.click(function() {
+            var z = parseFloat(Controls.tornamt.val());
+            Controls.tornamt.val(Math.round(
+                (z-Settings.tornStep)*Settings.precision)/Settings.precision
+            );
+            Controls.tornamt.change();
+          });
+
+
+          Controls.itersamt.change(function() {
+            var z = parseInt(Controls.itersamt.val(), 10);
+            z = Math.min(Math.max(z, 0), 10);
+            Controls.itersamt.val(z)
+            updateHash();
+          });
+
+          Controls.nextiters.click(function() {
+            var z = parseInt(Controls.itersamt.val(), 10);
+            Controls.itersamt.val(z+1);
+            Controls.itersamt.change();
+          });
+
+          Controls.previters.click(function() {
+            var z = parseInt(Controls.itersamt.val(), 10);
+            Controls.itersamt.val(z-1);
+            Controls.itersamt.change();
+          });
+
           Size = Utils.getSize();
-          Iterations = 6;
+
 
           Svg = d3.select('.svg-container').append('svg')
             .attr('id', 'svg')
             .attr('height', Size.h-2)
             .attr('width',  Size.w-2);
 
-          KS = new Cesaro(Svg, Fractal.init.ngram(4, 0.5, 0), { height:0.9 });
-          KS.iterate(Iterations).draw();
+          KS = new Cesaro(Svg,
+            Fractal.init.ngram(4, 0.6, 0),
+            { height:Settings.startTorn }
+          );
+          // KS.display(Settings.iterations);
 
+          $(window).on('hashchange', openpage);
           $(window).on('resize', resize);
+          parseInitialUrl(location.href);
         });
+
+        function parseInitialUrl(a) {
+            if (a.indexOf('?') > -1) {
+                var pageAndHash = a.substring(a.indexOf('?'));
+                var pageUrl = pageAndHash.substring(1);
+                var parsed = pageUrl.split('|');
+                var torn = parseFloat(parsed[0]);
+                Controls.tornamt.val(torn);
+                var iters = parseInt(parsed[1], 10);
+                Controls.itersamt.val(iters);
+                History.pushState({
+                    torn: torn, iterations: iters
+                }, '', pageAndHash);
+            }
+            openpage();
+        }
 
         function resize() {
           Size = Utils.getSize();
-          update();
-        }
-
-        function update() {
-          KS.clear();
-          KS.iterate(Iterations).draw();
+          Svg.attr('height', Size.h-2).attr('width',  Size.w-2);
+          openpage();
         }
         </script>
     </div>
