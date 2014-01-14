@@ -11,16 +11,26 @@ Cesaro = function (svg, points, opts) {
 Fractal = function (svg, points, iterFun, opts) {
   this.svg = svg;
   this.points = points;
+  this.initialPoints = points;
   this.iterFun = iterFun;
   this.opts = opts;
 };
 
+Fractal.prototype.display = function(iterations) {
+  this.clear().iterate(iterations).draw();
+};
+
 Fractal.prototype.clear = function() {
   this.svg.selectAll('*').remove();
+  return this;
 };
 
 Fractal.prototype.iterate = function(steps) {
-  if (!steps && steps !== 0) steps = 1;
+  this.points = this.initialPoints.slice(0);
+
+  if (!steps && steps !== 0) {
+    steps = 1;
+  }
 
   for (var p=0; p<this.points.length; p++) {
     for (var i=0; i<steps; i++) {
