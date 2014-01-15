@@ -71,6 +71,30 @@ Fractal.prototype.drawPoly = function (data) {
 };
 
 Fractal.iterators = {
+  poly: function (data) {
+    var newD = [];
+    for (var i = 0; i < data.length-1; i++) {
+      var d = data[i];
+      var e = data[i+1];
+      var third = {
+        x: (e.x - d.x)/3*this.opts.shiftx,
+        y: (e.y - d.y)/3*this.opts.shifty
+      };
+
+      newD.push({ x: d.x,                       y: d.y });
+      newD.push({ x: d.x + third.x,             y: d.y + third.y });
+      newD.push({ x: d.x + third.x   - third.y, y: d.y + third.y + third.x });
+      newD.push({ x: d.x + third.x*2 - third.y, y: d.y + 2*third.y + third.x });
+      newD.push({ x: d.x + third.x*2,           y: d.y + third.y*2 });
+      // newD.push({ x: e.x, y: e.y });
+    }
+    newD.push({
+      x: data[data.length-1].x,
+      y: data[data.length-1].y,
+    });
+    return newD;
+  },
+
   cesaro: function (data) {
     var newD = [];
     for (var i = 0; i < data.length-1; i++) {
