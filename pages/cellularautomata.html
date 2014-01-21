@@ -196,7 +196,8 @@
         function openpage () {
             ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
             var state = History.getState();
-            FA.display(state.data);
+            FA.opts = state.data;
+            FA.draw();
         };
 
         function resize () {
