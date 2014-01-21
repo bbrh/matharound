@@ -10,7 +10,8 @@
     <script src="/js/Canvas.js"></script>
     <script src="/js/Utils.js"></script>
     <script src="/js/GAnalytics.js"></script>
-    <script src="/js/FiniteAutomata.js"></script>
+    <script src="/js/automata/CellularAutomata.js"></script>
+    <script src="/js/automata/CellularAutomataConstructor.js"></script>
 </head>
 <body>
     <div class="content">
@@ -19,7 +20,7 @@
 
             <div style="display:table-row">
                 <h2 class="page-subheader" style="display:table-cell;  white-space: nowrap;">
-                    Finite automata
+                    Cellular automata
                 </h2>
 
                 <div style="display:table-cell; text-align:right;">
@@ -78,7 +79,7 @@
             <div class="menu"></div>
         </div>
 
-<script type="text/javascript">
+        <script type="text/javascript">
         $(document).ready(function() {
             Controls = {
                 container : $('.canvas-container'),
