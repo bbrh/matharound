@@ -217,7 +217,7 @@
         }
 
         function openpage () {
-            // ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
+            ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
             var state = History.getState();
             FA.opts = state.data;
             FA.draw();
