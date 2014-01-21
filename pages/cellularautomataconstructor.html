@@ -1,0 +1,252 @@
+<html>
+<head>
+    <title>matharound - cellular automata - constructor</title>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="file:///C:/dev/ma/matharound-master/css/ma.css">
+    <script src="/js/libs/jquery.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script src="/js.libs/jquery.history.js"></script>
+    <script src="/js/Canvas.js"></script>
+    <script src="/js/Utils.js"></script>
+    <script src="/js/libs/d3.v3.min.js"></script>
+    <script src="/js/GAnalytics.js"></script>
+    <script src="/js/automata/CellularAutomata.js"></script>
+    <script src="/js/automata/CellularAutomataConstructor.js"></script>
+</head>
+<body>
+    <div class="content">
+        <header class="header">
+            <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
+
+            <div style="display:table-row">
+                <h2 class="page-subheader" style="display:table-cell;  white-space: nowrap;">
+                    Cellular automata constructor
+                </h2>
+
+                <div style="display:table-cell; text-align:right;">
+<!--                     <div class="dropdown col-sm-5" >
+                        <input type="range" class="pixel-size2" value="0" min="0" max="5" step="1"/>
+                    </div> -->
+                    <div class="dropdown col-sm-3" ></div>
+                    <div class="dropdown col-sm-2" >
+                        <button type="button" class="btn btn-default btn-sm dropdown-toggle seed-selector" data-toggle="dropdown"  id="dropdownMenu1">Seed
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                        <li role="presentation"><a role="menuitem" class="seed-item menu-item" tabindex="-1" data="empty">Empty</a></li>
+                        <li role="presentation"><a role="menuitem" class="seed-item menu-item" tabindex="-1" data="point">Point</a></li>
+                        <li role="presentation"><a role="menuitem" class="seed-item menu-item" tabindex="-1" data="filled">Filled</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation"><a role="menuitem" class="seed-item menu-item" tabindex="-1" data="random25">Random 25%</a></li>
+                        <li role="presentation"><a role="menuitem" class="seed-item menu-item" tabindex="-1" data="random50">Random 50%</a></li>
+                        <li role="presentation"><a role="menuitem" class="seed-item menu-item" tabindex="-1" data="random75">Random 75%</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation"><a role="menuitem" class="seed-item menu-item" tabindex="-1" data="checkboard">Checkboard</a></li>
+                        <li role="presentation"><a role="menuitem" class="seed-item menu-item" tabindex="-1" data="symmetry1">Symmetry</a></li>
+                      </ul>
+                    </div>
+
+                    <div class="dropdown col-sm-1" ></div>
+
+                    <div class="row col-sm-3">
+                        <div class="input-group input-group-sm">
+                          <span class="input-group-addon">Rule #</span>
+                          <input type="text" class="form-control rule-id" style="min-width:4em;" value="30" />
+                          <div class="input-group-btn">
+                            <button class="btn btn-default rule-prev" type="button">
+                                <span class="glyphicon glyphicon-arrow-down"></span><!-- Prev --></button>
+                            <button class="btn btn-default rule-next" type="button">
+                                <span class="glyphicon glyphicon-arrow-up"></span><!-- Next --></button>
+                          </div>
+                        </div><!-- /input-group -->
+                    </div>
+
+                    <div class="dropdown col-sm-1" ></div>
+
+                    <div class="row col-sm-2">
+                        <div class="input-group input-group-sm">
+                          <span class="input-group-addon">Pixel Size</span>
+                          <input type="text" class="form-control pixel-size" style="min-width:3em;" value="1" />
+                        </div><!-- /input-group -->
+                    </div>
+                </div>
+            </div>
+
+        </header>
+
+        <div class="wrap">
+            <div class="constructor-container" style="width:49%;float:left;"></div>
+            <div class="canvas-container"></div>
+            <div class="menu"></div>
+        </div>
+
+<script type="text/javascript">
+        $(document).ready(function() {
+            Controls = {
+                container : $('.canvas-container'),
+                menu      : $('.menu'),
+                seed      : $('.seed-selector'),
+                ruleid    : $('.rule-id'),
+                nextid    : $('.rule-next'),
+                previd    : $('.rule-prev'),
+                pixelsize : $('.pixel-size'),
+                constructor : $('.constructor-container')
+                // pixelsize2 : $('.pixel-size2')
+            };
+            Seed = 'point';
+            Size = Utils.getSize({x:2, y:1});
+            // History.Adapter.bind(window, 'statechange', openpage);
+            // History.Adapter.bind(window, 'hashchange', openpage);
+            $(window).on('hashchange', openpage);
+            $(window).on('resize', resize);
+
+            // FA = new FiniteAutomata(Controls.container, Controls.menu);
+            FA = new FiniteAutomata(new Canvas(Controls.container),
+                false,
+                Size
+            );
+            Constructor = new CellularAutomataConstructor(
+                Controls.constructor, {},
+                function () {
+                    var ruleId=0;
+                    while (JSON.stringify(FiniteAutomata.rules[ruleId]) !==
+                        JSON.stringify(Constructor.data)) {
+                        ruleId++;
+                    }
+                    // for (var ruleIdKey in FiniteAutomata.rules) {
+                    //     if (JSON.stringify(FiniteAutomata.rules[ruleIdKey]) ===
+                    //         JSON.stringify(Constructor.data))
+                    //         ruleId = ruleIdKey;
+                    // }
+                    Controls.ruleid.val(ruleId);
+                    Controls.ruleid.change();
+                }
+            );
+
+            $('.seed-item').click(function(event) {
+                Seed = $(this).attr('data');
+                Controls.seed.text('Seed: '+this.text);
+                updateHash();
+            });
+
+            Controls.pixelsize.change(function() {
+                if (Controls.pixelsize.val() < 1)
+                    Controls.pixelsize.val(1);
+                else if (Controls.pixelsize.val() > 40)
+                    Controls.pixelsize.val(40);
+                FA.pixelsize = Controls.pixelsize.val();
+                updateHash();
+            });
+
+            // Controls.pixelsize2.change(function() {
+            //     if (Controls.pixelsize2.val() < 0)
+            //         Controls.pixelsize2.val(0);
+            //     else if (Controls.pixelsize2.val() > 5)
+            //         Controls.pixelsize2.val(5);
+            //     FA.pixelsize = Math.pow(2, Controls.pixelsize2.val());
+            //     updateHash();
+            // });
+
+            Controls.ruleid.change(function() {
+                if (Controls.ruleid.val() < 1)
+                    Controls.ruleid.val(FA.numOfRules-1);
+                else if (Controls.ruleid.val() > FA.numOfRules-1)
+                    Controls.ruleid.val(1);
+                updateHash();
+            });
+
+            Controls.nextid.click(function() {
+                var z = parseInt(Controls.ruleid.val(), 10);
+                Controls.ruleid.val(z+1);
+                Controls.ruleid.change();
+            });
+
+            Controls.previd.click(function() {
+                var z = parseInt(Controls.ruleid.val(), 10);
+                Controls.ruleid.val(z-1);
+                Controls.ruleid.change();
+            });
+
+            parseInitialUrl(location.href);
+
+            openpage();
+        });
+
+        function updateHash() {
+            var ruleId = parseInt(Controls.ruleid.val(), 10);
+            // var pixelSize = Math.pow(2, parseInt(Controls.pixelsize2.val(), 10));
+            var pixelSize = parseInt(Controls.pixelsize.val(), 10);
+            History.replaceState({
+                seed:Seed, ruleId:ruleId, pixelSize:pixelSize
+            }, '', '?'+Seed+'|'+ruleId+'|'+pixelSize);
+            openpage();
+        }
+
+        function parseInitialUrl(a) {
+            if (a.indexOf('?') > -1) {
+                var pageAndHash = a.substring(a.indexOf('?'));
+                var pageUrl = pageAndHash.substring(1);
+                var parsed = pageUrl.split('|');
+                Controls.ruleid.val(parsed[1]);
+                // var pixelsizebase2 = Math.round(Math.log(parseInt(parsed[2], 10))/Math.log(2));
+                // Controls.pixelsize2.val(pixelsizebase2);
+                var selectedseed = $('.seed-item').filter(function(i, item) {
+                    return $(item).attr('data') === parsed[0];
+                });
+                Controls.seed.text('Seed: '+selectedseed.text());
+                var pixelsize = parseInt(parsed[2], 10);
+                Controls.pixelsize.val(pixelsize);
+                Seed = parsed[0];
+                History.pushState({
+                    seed:parsed[0], ruleId:parseInt(parsed[1], 10), pixelSize:pixelsize
+                }, '', pageAndHash);
+            } else {
+                var ruleid = 26;
+                var pixelsize = 1;
+                var seed = 'point';
+                Controls.seed.text('Seed: Point');
+                Controls.ruleid.val(ruleid);
+                Controls.nextid.val(pixelsize);
+                Controls.previd.val(seed);
+                History.replaceState({
+                    seed:seed, ruleId:ruleid, pixelSize:pixelsize
+                }, '', '?'+seed+'|'+ruleid+'|'+pixelsize);
+            }
+            openpage();
+        }
+
+        function openpage () {
+            // ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
+            var state = History.getState();
+            FA.opts = state.data;
+            FA.draw();
+
+
+            Constructor.data = FiniteAutomata.generateRules(256)[FA.opts.ruleId];
+            Constructor.display();
+        };
+
+        function resize () {
+            FA.cleanup();
+            Size = Utils.getSize({ x:2, y:1 });
+            var state = History.getState();
+            FA.opts = state.data;
+            FA.setSize(Size);
+            // FA = new FiniteAutomata(Controls.container, state.data, Size);
+            FA.draw();
+        }
+        </script>
+    </div>
+
+    <footer class="footer">
+        <div class="col-sm-6 footer-column">
+            <p class="text-left">Updates on twttr</p>
+            <p class="text-left">Made by me</p>
+        </div>
+        <div class="col-sm-6 footer-column">
+            <p class="text-right">Available on GitHub</p>
+        </div>
+    </footer>
+</body>
+</html>
