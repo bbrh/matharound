@@ -1,0 +1,38 @@
+$def with (content)
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>matharound</title>
+    <link type="text/css" rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/ma.css">
+    <script type="text/javascript" src="/static/js/libs/jquery.min.js"></script>
+    $if not content.debug:
+      <script type="text/javascript" src="/static/js/GAnalytics.js"></script>
+
+    <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="content">
+      <header class="header">
+        <h1 class="page-header1"><a href="/">Matharound</a></h1>
+        <h2 class="page-subheader">$content.title</h2>
+      </header>
+
+      <div class="wrap">
+        $:content
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="col-sm-6 footer-column">
+        <p class="text-left">Updates on twttr</p>
+        <p class="text-left">Made by me</p>
+      </div>
+      <div class="col-sm-6 footer-column">
+        <p class="text-right">Available on GitHub</p>
+      </div>
+    </footer>
+  </body>
+</html>
