@@ -9,6 +9,9 @@ IntegerInput = function (el, label, opts) {
 };
 
 FloatInput = function (el, label, opts) {
+  if (!opts.precision)
+    console.error('precision required for float controlled input');
+
   var aci = new AbstractControllerInput(el, label, opts,
     function(d) {
       return Math.round(parseFloat(d)*opts.precision)/opts.precision;
