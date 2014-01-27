@@ -11,42 +11,22 @@
     <script src="/js/Utils.js"></script>
     <script src="/js/fractals/Fractal.js"></script>
     <script src="/js/GAnalytics.js"></script>
+    <script src="/js/controls/ControlledInput.js"></script>
+    <script src="/js/controls/Dropdown.js"></script>
+    <script src="/js/controls/ControlsLib.js"></script>   
 </head>
 <body>
     <div class="content">
         <header class="header">
             <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
 
-            <div style="display:table-row">
-                <h2 class="page-subheader" style="display:table-cell;  white-space: nowrap;">
-                    Cesaro (Torn Square)
-                </h2>
-                
-                <div class="row col-sm-3">
-                    <div class="input-group input-group-sm">
-                      <span class="input-group-addon">Torn</span>
-                      <input type="text" class="form-control torn-amt" style="min-width:5em;" value="0.95" />
-                      <div class="input-group-btn">
-                        <button class="btn btn-default torn-prev" type="button">
-                            <span class="glyphicon glyphicon-arrow-down"></span><!-- Prev --></button>
-                        <button class="btn btn-default torn-next" type="button">
-                            <span class="glyphicon glyphicon-arrow-up"></span><!-- Next --></button>
-                      </div>
-                    </div><!-- /input-group -->
-                </div>
+            <h2 class="page-subheader" style="white-space: nowrap;">
+                Cesaro (Torn Square)
+            </h2>
 
-                <div class="row col-sm-3">
-                    <div class="input-group input-group-sm">
-                      <span class="input-group-addon">Iterations</span>
-                      <input type="text" class="form-control iters-amt" style="min-width:4em;" value="6" />
-                      <div class="input-group-btn">
-                        <button class="btn btn-default iters-prev" type="button">
-                            <span class="glyphicon glyphicon-arrow-down"></span><!-- Prev --></button>
-                        <button class="btn btn-default iters-next" type="button">
-                            <span class="glyphicon glyphicon-arrow-up"></span><!-- Next --></button>
-                      </div>
-                    </div><!-- /input-group -->
-                </div>
+            <div class="control-form">
+              <span class="torn control-element" style="width:13em;"></span>
+              <span class="iterations control-element" style="width:13em;"></span>
             </div>
 
         </header>
@@ -59,18 +39,18 @@
         Settings = {
           tornStep    : 0.025,
           startTorn   : 0.95,
-          startIters  : 6,
+          startIters  : 4,
           precision   : 1e3,
         };
 
         function updateHash() {
-          var torn = parseFloat(Controls.tornamt.val());
-          var iters = parseInt(Controls.itersamt.val(), 10);
+          var torn = Controls.torn.val();
+          var iters = Controls.iters.val();
 
           iters = Math.min(Math.max(iters, 0), 10);
 
           History.replaceState({
-              torn: torn, iterations: iters
+            torn: torn, iterations: iters
           }, '', '?'+torn+'|'+iters);
           openpage();
         }
@@ -83,61 +63,22 @@
         };
 
         $(document).ready(function() {
+          Controls = { };
 
+          Controls.iters = ControlsLib.fractals.iterations(
+            $('.iterations'), updateHash
+          );
 
-          Controls = {
-            tornamt  : $('.torn-amt'),
-            nexttorn : $('.torn-next'),
-            prevtorn : $('.torn-prev'),
-
-            itersamt  : $('.iters-amt'),
-            nextiters : $('.iters-next'),
-            previters : $('.iters-prev'),
-          };
-
-
-          Controls.tornamt.change(function() {
-            updateHash();
-          });
-
-          Controls.nexttorn.click(function() {
-            var z = parseFloat(Controls.tornamt.val());
-            Controls.tornamt.val(Math.round(
-                (z+Settings.tornStep)*Settings.precision)/Settings.precision
-            );
-            Controls.tornamt.change();
-          });
-
-          Controls.prevtorn.click(function() {
-            var z = parseFloat(Controls.tornamt.val());
-            Controls.tornamt.val(Math.round(
-                (z-Settings.tornStep)*Settings.precision)/Settings.precision
-            );
-            Controls.tornamt.change();
-          });
-
-
-          Controls.itersamt.change(function() {
-            var z = parseInt(Controls.itersamt.val(), 10);
-            z = Math.min(Math.max(z, 0), 10);
-            Controls.itersamt.val(z)
-            updateHash();
-          });
-
-          Controls.nextiters.click(function() {
-            var z = parseInt(Controls.itersamt.val(), 10);
-            Controls.itersamt.val(z+1);
-            Controls.itersamt.change();
-          });
-
-          Controls.previters.click(function() {
-            var z = parseInt(Controls.itersamt.val(), 10);
-            Controls.itersamt.val(z-1);
-            Controls.itersamt.change();
-          });
+          Controls.torn = new FloatInput(
+            $('.torn'), 'Torn', {
+              init: Settings.startTorn,
+              step: Settings.tornStep,
+              precision: Settings.precision,
+              onchange: updateHash
+            }
+          );
 
           Size = Utils.getSize();
-
 
           Svg = d3.select('.svg-container').append('svg')
             .attr('id', 'svg')
@@ -148,7 +89,6 @@
             Fractal.init.ngram(4, 0.6, 0),
             { height:Settings.startTorn }
           );
-          // KS.display(Settings.iterations);
 
           $(window).on('hashchange', openpage);
           $(window).on('resize', resize);
@@ -156,22 +96,22 @@
         });
 
         function parseInitialUrl(a) {
-            if (a.indexOf('?') > -1) {
-                var pageAndHash = a.substring(a.indexOf('?'));
-                var pageUrl = pageAndHash.substring(1);
-                var parsed = pageUrl.split('|');
-                var torn = parseFloat(parsed[0]);
-                var iters = parseInt(parsed[1], 10);
-            } else {
-                var torn = Settings.startTorn;
-                var iters = Settings.startIters;
-            }
-            Controls.tornamt.val(torn);
-            Controls.itersamt.val(iters);
-            History.pushState({
-                torn: torn, iterations: iters
-            }, '', pageAndHash);
-            openpage();
+          if (a.indexOf('?') > -1) {
+            var pageAndHash = a.substring(a.indexOf('?'));
+            var pageUrl = pageAndHash.substring(1);
+            var parsed = pageUrl.split('|');
+            var torn = parseFloat(parsed[0]);
+            var iters = parseInt(parsed[1], 10);
+          } else {
+            var torn = Settings.startTorn;
+            var iters = Settings.startIters;
+          }
+          Controls.torn.val(torn);
+          Controls.iters.val(iters);
+          History.pushState({
+            torn: torn, iterations: iters
+          }, '', pageAndHash);
+          openpage();
         }
 
         function resize() {
