@@ -11,55 +11,23 @@
     <script src="/js/Utils.js"></script>
     <script src="/js/GAnalytics.js"></script>
     <script src="/js/fractals/Fractal.js"></script>
+    <script src="/js/controls/ControlledInput.js"></script>
+    <script src="/js/controls/Dropdown.js"></script>
+    <script src="/js/controls/ControlsLib.js"></script>  
 </head>
 <body>
     <div class="content">
         <header class="header">
             <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
 
-            <div style="display:table-row">
-                <h2 class="page-subheader" style="display:table-cell;  white-space: nowrap;">
-                    Quadratic
-                </h2>
+            <h2 class="page-subheader" style="white-space: nowrap;">
+              Quadratic
+            </h2>
 
-                <div class="row col-sm-3">
-                    <div class="input-group input-group-sm">
-                      <span class="input-group-addon">ShiftX</span>
-                      <input type="text" class="form-control shiftx-amt" style="min-width:5em;" value="0.95" />
-                      <div class="input-group-btn">
-                        <button class="btn btn-default shiftx-prev" type="button">
-                            <span class="glyphicon glyphicon-arrow-down"></span><!-- Prev --></button>
-                        <button class="btn btn-default shiftx-next" type="button">
-                            <span class="glyphicon glyphicon-arrow-up"></span><!-- Next --></button>
-                      </div>
-                    </div><!-- /input-group -->
-                </div>
-
-                <div class="row col-sm-3">
-                    <div class="input-group input-group-sm">
-                      <span class="input-group-addon">ShiftY</span>
-                      <input type="text" class="form-control shifty-amt" style="min-width:5em;" value="0.95" />
-                      <div class="input-group-btn">
-                        <button class="btn btn-default shifty-prev" type="button">
-                            <span class="glyphicon glyphicon-arrow-down"></span><!-- Prev --></button>
-                        <button class="btn btn-default shifty-next" type="button">
-                            <span class="glyphicon glyphicon-arrow-up"></span><!-- Next --></button>
-                      </div>
-                    </div><!-- /input-group -->
-                </div>
-
-                <div class="row col-sm-3">
-                    <div class="input-group input-group-sm">
-                      <span class="input-group-addon">Iterations</span>
-                      <input type="text" class="form-control iters-amt" style="min-width:4em;" value="6" />
-                      <div class="input-group-btn">
-                        <button class="btn btn-default iters-prev" type="button">
-                            <span class="glyphicon glyphicon-arrow-down"></span><!-- Prev --></button>
-                        <button class="btn btn-default iters-next" type="button">
-                            <span class="glyphicon glyphicon-arrow-up"></span><!-- Next --></button>
-                      </div>
-                    </div><!-- /input-group -->
-                </div>
+            <div class="control-form">
+              <span class="shift-x control-element" style="width:13em;"></span>
+              <span class="shift-y control-element" style="width:13em;"></span>
+              <span class="iterations control-element" style="width:13em;"></span>
             </div>
 
         </header>
@@ -71,22 +39,20 @@
         <script type="text/javascript">
 
         Settings = {
-          tornStep    : 0.025,
-          startTorn   : 0.95,
+          shiftStep   : 0.025,
+          startShift  : 0.95,
           startIters  : 6,
           precision   : 1e3,
         };
 
         function updateHash() {
-          var shiftx = parseFloat(Controls.shiftxamt.val());
-          var shifty = parseFloat(Controls.shiftyamt.val());
-          var iters = parseInt(Controls.itersamt.val(), 10);
-
-          iters = Math.min(Math.max(iters, 0), 10);
+          var shiftx = Controls.shiftx.val();
+          var shifty = Controls.shifty.val();
+          var iters = Controls.iters.val();
 
           History.pushState({
-              shiftx: shiftx, shifty: shifty, iterations: iters
-          }, '', '?'+shiftx+'|'+shifty);
+            shiftx: shiftx, shifty: shifty, iterations: iters
+          }, '', '?'+iters+'|'+shiftx+'|'+shifty);
           openpage();
         }
 
@@ -99,96 +65,39 @@
         };
 
         $(document).ready(function() {
+          Controls = { };
 
+          Controls.iters = ControlsLib.fractals.iterations(
+            $('.iterations'), updateHash
+          );
 
-          Controls = {
-            shiftxamt  : $('.shiftx-amt'),
-            nextshiftx : $('.shiftx-next'),
-            prevshiftx : $('.shiftx-prev'),
+          Controls.shiftx = new FloatInput(
+            $('.shift-x'), 'ShiftX', {
+              init: Settings.startShift,
+              step: Settings.shiftStep,
+              precision: Settings.precision,
+              onchange: updateHash
+            }
+          );
 
-            shiftyamt  : $('.shifty-amt'),
-            nextshifty : $('.shifty-next'),
-            prevshifty : $('.shifty-prev'),
-
-            itersamt  : $('.iters-amt'),
-            nextiters : $('.iters-next'),
-            previters : $('.iters-prev'),
-          };
-
-
-          Controls.shiftxamt.change(function() {
-            updateHash();
-          });
-
-          Controls.nextshiftx.click(function() {
-            var z = parseFloat(Controls.shiftxamt.val());
-            Controls.shiftxamt.val(Math.round(
-                (z+Settings.tornStep)*Settings.precision)/Settings.precision
-            );
-            Controls.shiftxamt.change();
-          });
-
-          Controls.prevshiftx.click(function() {
-            var z = parseFloat(Controls.shiftxamt.val());
-            Controls.shiftxamt.val(Math.round(
-                (z-Settings.tornStep)*Settings.precision)/Settings.precision
-            );
-            Controls.shiftxamt.change();
-          });
-
-
-          Controls.shiftyamt.change(function() {
-            updateHash();
-          });
-
-          Controls.nextshifty.click(function() {
-            var z = parseFloat(Controls.shiftyamt.val());
-            Controls.shiftyamt.val(Math.round(
-                (z+Settings.tornStep)*Settings.precision)/Settings.precision
-            );
-            Controls.shiftyamt.change();
-          });
-
-          Controls.prevshifty.click(function() {
-            var z = parseFloat(Controls.shiftyamt.val());
-            Controls.shiftyamt.val(Math.round(
-                (z-Settings.tornStep)*Settings.precision)/Settings.precision
-            );
-            Controls.shiftyamt.change();
-          });
-
-
-          Controls.itersamt.change(function() {
-            var z = parseInt(Controls.itersamt.val(), 10);
-            z = Math.min(Math.max(z, 0), 10);
-            Controls.itersamt.val(z)
-            updateHash();
-          });
-
-          Controls.nextiters.click(function() {
-            var z = parseInt(Controls.itersamt.val(), 10);
-            Controls.itersamt.val(z+1);
-            Controls.itersamt.change();
-          });
-
-          Controls.previters.click(function() {
-            var z = parseInt(Controls.itersamt.val(), 10);
-            Controls.itersamt.val(z-1);
-            Controls.itersamt.change();
-          });
+          Controls.shifty = new FloatInput(
+            $('.shift-y'), 'ShiftY', {
+              init: Settings.startShift,
+              step: Settings.shiftStep,
+              precision: Settings.precision,
+              onchange: updateHash
+            }
+          );
 
           Size = Utils.getSize();
-
 
           Svg = d3.select('.svg-container').append('svg')
             .attr('id', 'svg')
             .attr('height', Size.h-2)
             .attr('width',  Size.w-2);
 
-          KS = new Cesaro(Svg,
-            Fractal.init.ngram(4, 0.3, 0),
-            {
-                shiftx:1, shifty:1
+          KS = new Cesaro(Svg, Fractal.init.ngram(4, 0.3, 0), {
+              shiftx:1, shifty:1
             }
           );
           KS.iterFun = Fractal.iterators.poly;
@@ -200,25 +109,25 @@
         });
 
         function parseInitialUrl(a) {
-            if (a.indexOf('?') > -1) {
-                var pageAndHash = a.substring(a.indexOf('?'));
-                var pageUrl = pageAndHash.substring(1);
-                var parsed = pageUrl.split('|');
-                var shiftx = parseFloat(parsed[0]);
-                var shifty = parseFloat(parsed[1]);
-                var iters = parseInt(parsed[1], 10);
-            } else {
-                var shiftx = Settings.startShift;
-                var shifty = Settings.startShift;
-                var iters = Settings.startIters;
-            }
-            Controls.shiftxamt.val(shiftx);
-            Controls.shiftyamt.val(shifty);
-            Controls.itersamt.val(iters);
-            History.replaceState({
-                shiftx: shiftx, shifty: shifty, iterations: iters
-            }, '', pageAndHash);
-            openpage();
+          if (a.indexOf('?') > -1) {
+            var pageAndHash = a.substring(a.indexOf('?'));
+            var pageUrl = pageAndHash.substring(1);
+            var parsed = pageUrl.split('|');
+            var shiftx = parseFloat(parsed[1]);
+            var shifty = parseFloat(parsed[2]);
+            var iters = parseInt(parsed[0], 10);
+          } else {
+            var shiftx = Settings.startShift;
+            var shifty = Settings.startShift;
+            var iters = Settings.startIters;
+          }
+          Controls.shiftx.val(shiftx);
+          Controls.shifty.val(shifty);
+          Controls.iters.val(iters);
+          History.replaceState({
+              shiftx: shiftx, shifty: shifty, iterations: iters
+          }, '', pageAndHash);
+          openpage();
         }
 
         function resize() {

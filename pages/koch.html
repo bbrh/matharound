@@ -5,20 +5,26 @@
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/css/ma.css">
     <script src="/js/libs/jquery.min.js"></script>
+    <script src="/js/libs/jquery.history.js"></script>
     <script src="/js/libs/d3.v3.min.js"></script>
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
     <script src="/js/Utils.js"></script>
+    <script src="/js/GAnalytics.js"></script>
     <script src="/js/fractals/Fractal.js"></script>
+    <script src="/js/controls/ControlledInput.js"></script>
+    <script src="/js/controls/Dropdown.js"></script>
+    <script src="/js/controls/ControlsLib.js"></script>   
 </head>
 <body>
     <div class="content">
         <header class="header">
             <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
+            <h2 class="page-subheader" style="white-space: nowrap;">
+              Koch Snowflake
+            </h2>
 
-            <div style="display:table-row">
-                <h2 class="page-subheader" style="display:table-cell;  white-space: nowrap;">
-                    Koch Snowflake
-                </h2>
+            <div class="control-form">
+              <span class="iterations control-element" style="width:13em;"></span>
             </div>
 
         </header>
@@ -37,11 +43,48 @@
             .attr('height', Size.h-2)
             .attr('width',  Size.w-2);
 
+          Controls = {};
+          Controls.iters = ControlsLib.fractals.iterations(
+            $('.iterations'), updateHash
+          );
+
           KS = new Koch(Svg, Fractal.init.ngram(3, 0.5, Math.PI), { angle:1 });
           KS.iterate(Iterations).draw();
 
+          $(window).on('hashchange', openpage);
           $(window).on('resize', resize);
         });
+
+        function openpage () {
+          ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
+          var state = History.getState();
+          KS.display(state.data.iterations)
+        };
+
+        function updateHash() {
+          var iters = Controls.iters.val();
+
+          History.replaceState({
+            iterations: iters
+          }, '', '?'+iters);
+          openpage();
+        }
+
+        function parseInitialUrl(a) {
+          if (a.indexOf('?') > -1) {
+            var pageAndHash = a.substring(a.indexOf('?'));
+            var pageUrl = pageAndHash.substring(1);
+            var parsed = pageUrl.split('|');
+            var iters = parseInt(parsed[0], 10);
+          } else {
+            var iters = 4;
+          }
+          Controls.iters.val(iters);
+          History.pushState({
+            iterations: iters
+          }, '', pageAndHash);
+          openpage();
+        }
 
         function resize() {
           Size = Utils.getSize();
