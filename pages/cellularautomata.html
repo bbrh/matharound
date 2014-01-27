@@ -19,62 +19,41 @@
 <body>
     <div class="content">
         <header class="header">
-          <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
+            <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
 
-          <h2 class="page-subheader" style="white-space: nowrap;">
-            Cellular automata constructor
-          </h2>
+            <h2 class="page-subheader" style="white-space: nowrap;">
+                Cellular automata
+            </h2>
 
-          <div class="control-form">
-            <span class="pixel-size control-element" style="width:13em; "></span>
-            <span class="rule-selector control-element" style="width:13em; "></span>
-            <span class="seed-menu control-element" style=""></span>
-          </div>
+            <div class="control-form">
+                <span class="pixel-size control-element" style="width:13em; "></span>
+                <span class="rule-selector control-element" style="width:13em; "></span>
+                <span class="seed-menu control-element" style="" ></span>
+
+            </div>
+
         </header>
 
         <div class="wrap">
-          <div class="constructor-container col-md-4 col-sm-12"></div>
-          <div class="canvas-container col-md-8 col-sm-12"></div>
-          <div class="menu"></div>
+            <div class="canvas-container"></div>
         </div>
 
         <script type="text/javascript">
         $(document).ready(function() {
-            Controls = {
-              container : $('.canvas-container'),
-              constructor : $('.constructor-container')
-            };
-            Seed = 'point';
-            Size = Utils.getSize(false, Controls.container);
+            Controls = { container : $('.canvas-container') };
+            Size = Utils.getSize();
+            FA = new FiniteAutomata(new Canvas(Controls.container), Controls.menu);
             $(window).on('hashchange', openpage);
             $(window).on('resize', resize);
 
-            FA = new FiniteAutomata(
-              new Canvas(Controls.container),
-              false,
-              Size
-            );
-
-            Constructor = new CellularAutomataConstructor(
-              Controls.constructor, {},
-              function () {
-                var ruleId=0;
-                while (JSON.stringify(FiniteAutomata.rules[ruleId]) !==
-                  JSON.stringify(Constructor.data)) {
-                  ruleId++;
-                }
-                Controls.ruleid.val(ruleId);
-              }
-            );
-
             Controls.seed = ControlsLib.automatas.seed(
-              $('.seed-menu'), updateHash
+                $('.seed-menu'), updateHash
             );
             Controls.pixelsize = ControlsLib.automatas.pixelSize(
-              $('.pixel-size'), updateHash
+                $('.pixel-size'),  updateHash
             );
-            Controls.ruleid = ControlsLib.automatas.ruleId(
-              $('.rule-selector'), FA.numOfRules-1, updateHash
+            Controls.ruleid = ControlsLib.automatas.pixelSize(
+                $('.rule-selector'), FA.numOfRules-1, updateHash
             );
 
             parseInitialUrl(location.href);
@@ -83,64 +62,62 @@
         });
 
         function updateHash() {
-          var seed = Controls.seed.val();
-          var ruleId = Controls.ruleid.val();
-          var pixelSize = Controls.pixelsize.val();
-          History.replaceState({
-              seed:seed, ruleId:ruleId, pixelSize:pixelSize
-          }, '', '?'+seed+'|'+ruleId+'|'+pixelSize);
-          openpage();
+            var seed = Controls.seed.val();
+            var ruleId = Controls.ruleid.val();
+            var pixelSize = Controls.pixelsize.val();
+            History.replaceState({
+                seed:seed, ruleId:ruleId, pixelSize:pixelSize
+            }, '', '?'+seed+'|'+ruleId+'|'+pixelSize);
+            openpage();
         }
 
         function parseInitialUrl(a) {
-          if (a.indexOf('?') > -1) {
-            var pageAndHash = a.substring(a.indexOf('?'));
-            var pageUrl = pageAndHash.substring(1);
-            var parsed = pageUrl.split('|');
+            if (a.indexOf('?') > -1) {
+                var pageAndHash = a.substring(a.indexOf('?'));
+                var pageUrl = pageAndHash.substring(1);
+                var parsed = pageUrl.split('|');
 
-            var seed = parsed[0];
-            Controls.seed.val(seed);
+                var seed = parsed[0];
+                Controls.seed.val(seed);
 
-            var ruleId = parseInt(parsed[1], 10);
-            Controls.ruleid.val(ruleId);
+                var ruleId = parseInt(parsed[1], 10);
+                Controls.ruleid.val(ruleId);
 
-            var pixelsize = parseInt(parsed[2], 10);
-            Controls.pixelsize.val(pixelsize);
+                var pixelsize = parseInt(parsed[2], 10);
+                Controls.pixelsize.val(pixelsize);
 
-            History.pushState({
-                seed:seed, ruleId:ruleId, pixelSize:pixelsize
-            }, '', pageAndHash);
-          } else {
-            var ruleid = 26;
-            var pixelsize = 1;
-            var seed = 'point';
-            Controls.ruleid.val(ruleid);
-            Controls.pixelsize.val(pixelsize);
-            Controls.seed.val(seed);
-            History.replaceState({
-                seed:seed, ruleId:ruleid, pixelSize:pixelsize
-            }, '', '?'+seed+'|'+ruleid+'|'+pixelsize);
-          }
-          openpage();
+                History.pushState({
+                    seed:seed, ruleId:ruleId, pixelSize:pixelsize
+                }, '', pageAndHash);
+            } else {
+                var ruleid = 26;
+                var pixelsize = 1;
+                var seed = 'point';
+                Controls.ruleid.val(ruleid);
+                Controls.pixelsize.val(pixelsize);
+                Controls.seed.val(seed);
+                History.replaceState({
+                    seed:seed, ruleId:ruleid, pixelSize:pixelsize
+                }, '', '?'+seed+'|'+ruleid+'|'+pixelsize);
+            }
+            openpage();
+
         }
 
         function openpage () {
-          ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
-          var state = History.getState();
-          FA.opts = state.data;
-          FA.draw();
-          Constructor.data = FiniteAutomata.rules[FA.opts.ruleId];
-          Constructor.display();
+            ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
+            var state = History.getState();
+            FA.opts = state.data;
+            FA.draw();
         };
 
         function resize () {
-          FA.cleanup();
-          Size = Utils.getSize(false, Controls.container);
-          var state = History.getState();
-          FA.opts = state.data;
-          FA.setSize(Size);
-          // FA = new FiniteAutomata(Controls.container, state.data, Size);
-          FA.draw();
+            FA.cleanup();
+            Size = Utils.getSize();
+            var state = History.getState();
+            FA.opts = state.data;
+            FA.setSize(Size);
+            FA.draw();
         }
         </script>
     </div>
