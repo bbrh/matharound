@@ -1,0 +1,226 @@
+<html>
+<head>
+    <title>matharound - game of life</title>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/ma.css">
+    <script src="/js/libs/jquery.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script src="/js/libs/jquery.history.js"></script>
+    <script src="/js/libs/d3.v3.min.js"></script>
+    <script src="/js/Canvas.js"></script>
+    <script src="/js/gol/GameOfLife.js"></script>
+    <script src="/js/gol/State.js"></script>
+    <script src="/js/gol/PresetState.js"></script>
+    <script src="/js/Utils.js"></script>
+    <script src="/js/controls/ControlsLib.js"></script>
+    <script src="/js/controls/ControlledInput.js"></script>
+    <script src="/js/controls/Dropdown.js"></script>
+    <script src="/js/GAnalytics.js"></script>
+</head>
+<body>
+    <div class="content">
+        <header class="header">
+            <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
+
+            <h2 class="page-subheader" style="white-space: nowrap;">
+                Game of Life
+            </h2>
+
+            <div class="control-form">
+                <!--<span class="pixel-size control-element" style=" width:13em" ></span>-->
+                <span class="input-group input-group-sm control-element input-group-btn" style=" width:20em">
+                    <div class=" input-group input-group-sm">
+                        <!-- <div class="input-group-addon">Animation</div> -->
+                        <div class="input-group-addon">zoom:</div>
+                        <input value="10" class="form-control pixel-size" type="text">
+                        <div class="input-group-addon">speed:</div>
+                        <input value="10" class="form-control anim-speed" type="text">
+                        <div class=" input-group-btn">
+                            <button type="button" class="btn start-anim btn-default" data-toggle="button">
+                                <span class="glyphicon glyphicon-play"></span>
+                            </button>
+                            <button type="button" class="btn do-step btn-default">
+                                <span class="glyphicon glyphicon-step-forward"></span>
+                            </button>
+                        </div>
+                    </div>
+                </span>
+
+<!--                 <span class="input-group input-group-sm control-element ">
+                    <span class="input-group-addon " style="width:10em;">B234/S89345</span>
+                    <span class="rule-menu " style="" ></span>
+                </span>
+ -->
+                <span class="rule input-group input-group-sm control-element"></span>
+                <span class="seed-menu control-element" style="" ></span>
+
+            </div>
+
+        </header>
+
+        <div class="wrap">
+            <div class="canvas-container"></div>
+        </div>
+
+        <script type="text/javascript">
+
+        function toBase(z, base) {
+            return (z - z % base)/base;
+        }
+
+        Settings = {
+            pixelSize: 10,
+            seed: '',
+            speed: 1e2
+        };
+
+        function updateHash() {
+            ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
+            var game = Controls.game.val();
+            var seed = Controls.seed.val();
+
+            var pixelSize = Settings.pixelSize;
+            History.replaceState({
+                game:game, seed:seed, pixelSize:pixelSize
+            }, '', '?'+game+'|'+seed+'|'+pixelSize);
+            openpage();
+        };
+
+        function openpage () {
+            // ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
+            var state = History.getState().data;
+            if (!state.game || !state.seed)
+                return;
+            if (state.seed !== Settings.seed) {
+                var d = dim();
+                if (state.seed.indexOf('random') === 0) {
+                    var r = state.seed.substring(6);
+                    var ri = 1 - parseInt(r, 10)/100;
+                    g.state = new RandomState(d[0], d[1], ri);
+                } else if (state.seed.indexOf('islands') === 0) {
+                    var r = state.seed.substring(7);
+                    var ri = 1 - parseInt(r, 10)/100;
+                    g.state = new IslandsState(d[0], d[1], ri);
+                } else if (state.seed.indexOf('preset') === 0) {
+                    g.state = new PresetState(d[0], d[1], state.seed);
+                } else if (state.seed === 'strange') {
+                    g.state = new StrangeState(d[0], d[1], 0.8);
+                }
+                Settings.seed = state.seed;
+            }
+            g.rule = Gol.rules.constructor(state.game);
+            g.draw();
+        };
+
+        function dim () {
+            return [
+                toBase(Size.w, Settings.pixelSize),
+                toBase(Size.h, Settings.pixelSize)
+            ];
+        }
+
+        $(document).ready(function() {
+            Controls = {
+                container : $('.canvas-container'),
+                start : $('.start-anim'),
+                step : $('.do-step'),
+                speed : $('.anim-speed'),
+                zoom : $('.pixel-size'),
+                still : $('.stilllife'),
+            };
+            Size = Utils.getSize();
+            g = new Gol(new Canvas(Controls.container), {
+                size: dim(),
+                pixelSize: Settings.pixelSize,
+                onStill: function (iters) {
+                    if (animation) {
+                        Controls.start.click();
+                    }
+                    $('.stillife-period', Controls.still).text(iters || 'static');
+                    Controls.still.modal();
+                }
+            });
+
+            Controls.game = new ControlsLib.gol.rule(
+                $('.rule'), updateHash
+            );
+            Controls.seed = ControlsLib.gol.seed(
+                $('.seed-menu'), updateHash
+            );
+            // Controls.pixelSize = ControlsLib.automatas.pixelSize(
+            //     $('.pixel-size'),  updateHash
+            // );
+
+            Controls.zoom.val(Settings.pixelSize);
+            Controls.zoom.bind('change', function () {
+                var val = parseFloat(Controls.zoom.val());
+                Settings.pixelSize = val;
+                g.pixelSize = Settings.pixelSize;
+                g.size = dim();
+            });
+
+            Controls.speed.val(1/(Settings.speed / 1000));
+            Controls.speed.bind('change', function () {
+                var val = 1/parseFloat(Controls.speed.val()+0.0001) * 1000;
+                Settings.speed = val;
+                if (animation) {
+                    animStop();
+                    animStart();
+                }
+            });
+
+            g.draw();
+            animation = false;
+            Controls.step.on('click', function (e) {
+                if (!animation)
+                    g.step();
+            });
+            Controls.start.on('click', function (e) {
+                if (!animation) {
+                    animStart();
+                } else {
+                    animStop();
+                }
+            });
+
+            Controls.game.val('B3/S23');
+            Controls.seed.val('random25');
+        });
+
+        function animStop () {
+            $('.glyphicon.glyphicon-pause').attr('class', 'glyphicon glyphicon-play')
+            clearInterval(animation);
+            animation = false;
+        }
+
+        function animStart () {
+            $('.glyphicon.glyphicon-play').attr('class', 'glyphicon glyphicon-pause')
+            animation = window.setInterval(function () {
+                g.step();
+            }, Settings.speed);
+        }
+
+        </script>
+    </div>
+
+    <div class="stilllife modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                You've reached still life state. Period: <span class="stillife-period">unknown</span>.
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="col-sm-6 footer-column">
+            <p class="text-left">Updates on twttr</p>
+            <p class="text-left">Made by me</p>
+        </div>
+        <div class="col-sm-6 footer-column">
+            <p class="text-right">Available on GitHub</p>
+        </div>
+    </footer>
+</body>
+</html>
+
