@@ -7,13 +7,17 @@ Canvas = function (container, opts, size) {
     .attr('width', this.size.w)
     .attr('height', this.size.h)
     .appendTo(this.container);
-
+  this.opts = opts;
 };
 
 Canvas.prototype.init = function() {
   this.cleanup();
 
   this.ctx = this.canvas[0].getContext('2d');
+  if (this.opts && this.opts.background) {
+    this.ctx.fillStyle = this.opts.background;
+    this.ctx.fillRect(0, 0, this.size.w, this.size.h);
+  }
   this.canvasData = this.ctx.getImageData(0, 0, this.size.w, this.size.h);
 };
 
