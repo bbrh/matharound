@@ -12,76 +12,166 @@
 <body>
     <div class="content">
         <header class="header">
-            <h1 class="page-header1"><a href="file:///C:/dev/ma2/index.html">Matharound</a></h1>
-
-            <h2 class="page-subheader" style="white-space: nowrap;">
-                Cellular automata catalogue
-            </h2>
-
-            <div class="control-form">
-                <span class="seed-menu control-element" style="min-width: 10em;" ></span>
-            </div>
-
+            <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
+            <h2 class="page-subheader">Beauty is everywhere</h2>
         </header>
 
         <div class="wrap">
-            <!--<div class="canvas-container"></div>-->
+            <!-- <div style="display:table-row; width:100%"> -->
+                <div class="col-sm-4 main-section-column">
+                    <h3 class="main-section-header">Finite Automata</h3>
+                    <div class="mylink-container">
+                    	<p class="mylink"><a href="/pages/cellularautomatacatalogue.html">Catalogue</a></p>
+                        <p class="mylink"><a href="/pages/cellularautomata.html">Interactive model</a></p>
+                        <p class="mylink"><a href="/pages/cellularautomataconstructor.html">Constructor</a></p>
+                        <p class="mylink"><a href="/pages/gameoflife.html">The Game of Life</a></p>
+                    </div>
+                </div>
+
+<!--                <div class="col-md-9 main-section-column">
+                    <h3 class="main-section-header">Fractals</h3>
+
+                    <div class="col-md-2 main-section-subcolumn">
+                        <h4>Cantor</h4>
+                        <div class="mylink-container">
+                            <p class="mylink">Cantor set</p>
+                            <p class="mylink">Smith–Volterra–Cantor set</p>
+                            <p class="mylink">2D Cantor dust</p>
+                            <p class="mylink">3D Cantor dust</p>
+                            <p class="mylink">Asymmetric Cantor set</p>
+                            <p class="mylink">Generalized Cantor set</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 main-section-subcolumn">
+                        <h4>Koch</h4>
+                        <div class="mylink-container">
+                            <p class="mylink">Koch curve</p>
+                            <p class="mylink">3D Koch curve</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 main-section-subcolumn">
+                        <h4>Julia</h4>
+                        <div class="mylink-container">
+                            <p class="mylink">Julia set</p>
+                            <p class="mylink">Dendrite Julia set</p>
+                            <p class="mylink">Douady rabbit</p>
+                            <p class="mylink">Julia set</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 main-section-subcolumn">
+                        <h4>Other</h4>
+                        <div class="mylink-container">
+                            <p class="mylink">Julia set</p>
+                            <p class="mylink">Dendrite Julia set</p>
+                            <p class="mylink">Douady rabbit</p>
+                            <p class="mylink">Julia set</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 main-section-subcolumn">
+                        <h4>Other</h4>
+                        <div class="mylink-container">
+                            <p class="mylink">Julia set</p>
+                            <p class="mylink">Dendrite Julia set</p>
+                            <p class="mylink">Douady rabbit</p>
+                            <p class="mylink">Julia set</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 main-section-subcolumn">
+                        <h4>Other</h4>
+                        <div class="mylink-container">
+                            <p class="mylink">Julia set</p>
+                            <p class="mylink">Dendrite Julia set</p>
+                            <p class="mylink">Douady rabbit</p>
+                            <p class="mylink">Julia set</p>
+                        </div>
+                    </div>
+                </div> -->
+
+
+<!--             </div>
+            <div style="display:table-row; width:100%">
+ -->             <!--    <div class="col-sm-4 main-section-column">
+                    <h3 class="main-section-header">N-Body Simulations</h3>
+                    <div class="mylink-container">
+                        <p class="mylink"><a href="/pages/siniteoutomatalarsystem.html">Solar system</a></p>
+                        <p class="mylink"><a href="/pages/cinitedutomatam.html">Cold Dark matter</a></p>
+                    </div>
+                </div> -->
+
+                <div class="col-sm-4 main-section-column">
+                    <h3 class="main-section-header">Waves</h3>
+                    <div class="mylink-container">
+                        <p class="mylink"><a href="/pages/waves.html">Point sources in 2D</a></p>
+                        <p class="mylink"><a href="/pages/interference.html">Interference</a></p>
+<!-- <p class="mylink">Double slit experiment</p> -->
+                    </div>
+                </div>
+                <div class="col-sm-4 main-section-column">
+                    <h3 class="main-section-header">Fractals</h3>
+                    <div class="mylink-container">
+                        <p class="mylink"><a href="/pages/koch.html">Koch</a></p>
+                        <p class="mylink"><a href="/pages/cesaro.html">Cesaro</a></p>
+                        <p class="mylink"><a href="/pages/quad.html">Quadratic</a></p>
+                        <p class="mylink"><a href="/pages/julia.html">Julia Set</a></p>
+<!-- <p class="mylink">Double slit experiment</p> -->
+                    </div>
+                </div>
+                
+            <!-- </div> -->
         </div>
+<!--         <div class="wrap">
+            <div class="col-md-3 main-section-column">
+                <h3 class="main-section-header">Finite Automata</h3>
+                <div class="mylink-container">
+                    <p class="mylink">Intro</p>
+                    <p class="mylink">Interactive model</p>
+                    <p class="mylink">Wide input range</p>
+                    <p class="mylink">Other dimensions?</p>
+                </div>
 
-        <script type="text/javascript">
-				function getUrl (constructor, ruleId) {
-					return 'cellularautomata'+(constructor ? 'constructor' : '')+'.html?random50|'+ruleId+'|1';
-				};
+                <h3 class="main-section-header">Fractals</h3>
+                <div class="mylink-container">
+                    <p class="mylink">Julia</p>
+                    <p class="mylink">Mobius</p>
+                    <p class="mylink">Mandelbrodt</p>
+                </div>
+            </div>
 
-				function updateHash() {
-            var seed = Controls.seed.val();
-//            var ruleId = Controls.ruleid.val();
-//            var pixelSize = Controls.pixelsize.val();
-//            var neighbWidth = Controls.neighbWidth.val();
-//            var states = Controls.states.val();
-            History.replaceState({
-                seed:seed//, ruleId:ruleId, pixelSize:pixelSize, neighbWidth:neighbWidth, states:states
-            },'','?'+seed );//+'|'+ruleId+'|'+pixelSize+'|'+neighbWidth+'|'+states);
-            openpage();
-        }
+            <div class="col-md-6 main-section-column">
+                <h3 class="main-section-header">N-Body Simulations</h3>
+                <div class="col-md-6 main-section-subcolumn">
+                    <h4>Gravity</h4>
+                    <div class="mylink-container">
+                        <p class="mylink">Forces on rotating object</p>
+                        <p class="mylink">Solar system</p>
+                        <p class="mylink">Cold Dark matter</p>
+                    </div>
+                </div>
+                <div class="col-md-6 main-section-subcolumn">
+                    <h4>Other</h4>
+                    <div class="mylink-container">
+                        <p class="mylink">Bohr model</p>
+                        <p class="mylink">Gas particles</p>
+                        <p class="mylink">Multidimensional</p>
+                    </div>
+                </div>
+            </div>
 
-				function openpage () {
-            // ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
-            var state = History.getState();
-            display();
-        };
-
-				function display () {
-						Controls.container.empty();
-						var numOfRules = 256; // implement;
-						var seed = History.getState().data.seed || 'random50';
-            var fas = {};
-						Size = Utils.getCustomSize(100, 100);
-            for (var i=0; i<numOfRules; i++) {
-                var canvasContainer = $('<div>', { class: 'card' }).appendTo(Controls.container);
-								var canvasLabels = $('<div>', { class: 'card-label' }).appendTo(canvasContainer);
-								$('<a>', { text: 'Rule #'+i, style: 'display:inline-block;', href:getUrl(false, i) }
-								 	).appendTo(canvasLabels);
-								fas[i] = new FiniteAutomata(new Canvas(canvasContainer, {}, Size),
-																						{ seed:seed, pixelSize: 1, ruleId: i},
-																						Size);
-								$('<a>', { text: 'Constructor', href:getUrl(true, i) }).appendTo(canvasLabels);
-            }
-						for (ruleId in fas) {
-							fas[ruleId].draw();
-						}
-				};
-
-        $(document).ready(function() {
-						Controls = {};
-						Controls.seed = ControlsLib.automatas.seed(
-							$('.seed-menu'), updateHash
-            );
-						Controls.container = $('.wrap');
-						display();
-				});
-
-        </script>
+            <div class="col-md-3 main-section-column">
+                <h3 class="main-section-header">Something else</h3>
+                <div class="mylink-container">
+                    <p class="mylink">Not sure</p>
+                    <p class="mylink">What to</p>
+                    <p class="mylink">Put here</p>
+                    <p class="mylink">Any ideas?</p>
+                </div>
+            </div>
+        </div> -->
     </div>
 
     <footer class="footer">
