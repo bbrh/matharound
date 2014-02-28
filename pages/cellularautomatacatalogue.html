@@ -47,19 +47,14 @@
 <body>
     <div class="content">
         <header class="header">
-            <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
+            <h1 class="page-header1"><a href="file:///C:/dev/ma2/index.html">Matharound</a></h1>
 
             <h2 class="page-subheader" style="white-space: nowrap;">
                 Cellular automata catalogue
             </h2>
 
             <div class="control-form">
-                <span class="neighb-width control-element" style="width:13em; "></span>
-                <span class="states control-element" style="width:13em; "></span>
-                <span class="pixel-size control-element" style="width:13em; "></span>
-                <span class="rule-selector control-element" style="width:13em; "></span>
-                <span class="seed-menu control-element" style="" ></span>
-
+                <span class="seed-menu control-element" style="min-width: 10em;" ></span>
             </div>
 
         </header>
@@ -70,36 +65,56 @@
 
         <script type="text/javascript">
 				function getUrl (constructor, ruleId) {
-					return '/pages/cellularautomata'+(constructor ? 'constructor' : '')+'.html?random50|'+ruleId+'|1';
+					return 'cellularautomata'+(constructor ? 'constructor' : '')+'.html?random50|'+ruleId+'|1';
 				};
 
-        $(document).ready(function() {
-            var numOfRules = 256; // implement;
+				function updateHash() {
+            var seed = Controls.seed.val();
+//            var ruleId = Controls.ruleid.val();
+//            var pixelSize = Controls.pixelsize.val();
+//            var neighbWidth = Controls.neighbWidth.val();
+//            var states = Controls.states.val();
+            History.replaceState({
+                seed:seed//, ruleId:ruleId, pixelSize:pixelSize, neighbWidth:neighbWidth, states:states
+            },'','?'+seed );//+'|'+ruleId+'|'+pixelSize+'|'+neighbWidth+'|'+states);
+            openpage();
+        }
+
+				function openpage () {
+            // ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
+            var state = History.getState();
+            display();
+        };
+
+				function display () {
+						Controls.container.empty();
+						var numOfRules = 256; // implement;
+						var seed = History.getState().data.seed || 'random50';
             var fas = {};
-            var container = $('.wrap');
 						Size = Utils.getCustomSize(100, 100);
             for (var i=0; i<numOfRules; i++) {
-                var canvasContainer = $('<div>', { class: 'card' }).appendTo(container);
+                var canvasContainer = $('<div>', { class: 'card' }).appendTo(Controls.container);
 								var canvasLabels = $('<div>', { class: 'card-label' }).appendTo(canvasContainer);
 								$('<a>', { text: 'Rule #'+i, style: 'display:inline-block;', href:getUrl(false, i) }
 								 	).appendTo(canvasLabels);
 								fas[i] = new FiniteAutomata(new Canvas(canvasContainer, {}, Size),
-																						{ seed:'random50', pixelSize: 1, ruleId: i},
+																						{ seed:seed, pixelSize: 1, ruleId: i},
 																						Size);
 								$('<a>', { text: 'Constructor', href:getUrl(true, i) }).appendTo(canvasLabels);
-
-								//$('canvas', canvasContainer).addClass('card-canvas');
-//                fas[i] = new FiniteAutomata(new Canvas(canvasContainer, {}, Size), {
-//                    defaultRule: new FiniteAutomata.Rule(i, 2, 3),
-//                    states: 2,
-//                    neighbWidth: 3,
-//                    ruleId: i
-//                });
             }
 						for (ruleId in fas) {
 							fas[ruleId].draw();
 						}
-        });
+				};
+
+        $(document).ready(function() {
+						Controls = {};
+						Controls.seed = ControlsLib.automatas.seed(
+							$('.seed-menu'), updateHash
+            );
+						Controls.container = $('.wrap');
+						display();
+				});
 
         </script>
     </div>
