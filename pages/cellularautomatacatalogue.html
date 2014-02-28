@@ -1,0 +1,116 @@
+<html>
+<head>
+    <title>matharound - finite automata</title>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/ma.css">
+    <script src="/js/libs/jquery.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script src="/js/libs/jquery.history.js"></script>
+    <script src="/js/Canvas.js"></script>
+    <script src="/js/Utils.js"></script>
+    <script src="/js/GAnalytics.js"></script>
+    <script src="/ma2/js/automata/CellularAutomata.js"></script>
+    <script src="/js/automata/CellularAutomataConstructor.js"></script>
+    <script src="/js/controls/ControlledInput.js"></script>
+    <script src="/js/controls/Dropdown.js"></script>
+    <script src="/js/controls/ControlsLib.js"></script>
+		<style type="text/css">
+			.card {
+				border: 1px solid #ddd;
+				margin: 0.5em;
+/*				padding: 0 1em;*/
+				height: 100px;
+				width: 200px;
+				display: inline-block;
+				transition: all 0.3s;
+				background-color: #FFFAF7;
+			}
+
+			.card:hover {
+				box-shadow: 3px 3px 10px #555;
+				background-color: #fff;
+			}
+
+			.card-canvas {
+				float: right;
+			}
+
+			.card-label {
+				float:left;
+				width: 98px;
+				padding-left: 1em;
+				padding-top: 1em;
+			}
+		</style>
+</head>
+<body>
+    <div class="content">
+        <header class="header">
+            <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
+
+            <h2 class="page-subheader" style="white-space: nowrap;">
+                Cellular automata catalogue
+            </h2>
+
+            <div class="control-form">
+                <span class="neighb-width control-element" style="width:13em; "></span>
+                <span class="states control-element" style="width:13em; "></span>
+                <span class="pixel-size control-element" style="width:13em; "></span>
+                <span class="rule-selector control-element" style="width:13em; "></span>
+                <span class="seed-menu control-element" style="" ></span>
+
+            </div>
+
+        </header>
+
+        <div class="wrap">
+            <!--<div class="canvas-container"></div>-->
+        </div>
+
+        <script type="text/javascript">
+				function getUrl (constructor, ruleId) {
+					return '/pages/cellularautomata'+(constructor ? 'constructor' : '')+'.html?random50|'+ruleId+'|1';
+				};
+
+        $(document).ready(function() {
+            var numOfRules = 256; // implement;
+            var fas = {};
+            var container = $('.wrap');
+						Size = Utils.getCustomSize(100, 100);
+            for (var i=0; i<numOfRules; i++) {
+                var canvasContainer = $('<div>', { class: 'card' }).appendTo(container);
+								var canvasLabels = $('<div>', { class: 'card-label' }).appendTo(canvasContainer);
+								$('<a>', { text: 'Rule #'+i, style: 'display:inline-block;', href:getUrl(false, i) }
+								 	).appendTo(canvasLabels);
+								fas[i] = new FiniteAutomata(new Canvas(canvasContainer, {}, Size),
+																						{ seed:'random50', pixelSize: 1, ruleId: i},
+																						Size);
+								$('<a>', { text: 'Constructor', href:getUrl(true, i) }).appendTo(canvasLabels);
+
+								//$('canvas', canvasContainer).addClass('card-canvas');
+//                fas[i] = new FiniteAutomata(new Canvas(canvasContainer, {}, Size), {
+//                    defaultRule: new FiniteAutomata.Rule(i, 2, 3),
+//                    states: 2,
+//                    neighbWidth: 3,
+//                    ruleId: i
+//                });
+            }
+						for (ruleId in fas) {
+							fas[ruleId].draw();
+						}
+
+        </script>
+    </div>
+
+    <footer class="footer">
+        <div class="col-sm-6 footer-column">
+            <p class="text-left">Updates on twttr</p>
+            <p class="text-left">Made by me</p>
+        </div>
+        <div class="col-sm-6 footer-column">
+            <p class="text-right">Available on GitHub</p>
+        </div>
+    </footer>
+</body>
+</html>
