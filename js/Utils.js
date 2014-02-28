@@ -22,3 +22,10 @@ Utils.getSize = function (factor) {
   return new Utils.Size(w, h);
 };
 
+Utils.getCustomSize = function (x, y) {
+	var h = y || Math.ceil(window.innerHeight -
+    $('.header').outerHeight() -
+    $('.footer').outerHeight());
+  var w = x || Math.ceil(window.innerWidth);
+  return new Utils.Size(w, h);
+};
