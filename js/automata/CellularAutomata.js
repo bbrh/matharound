@@ -4,7 +4,16 @@ FiniteAutomata = function (canvas, opts, size) {
   this.canvas = canvas;
   this.opts = opts;
   this.size = size;
+  this.gap = this.size.h;
+  this.stat = {
+    entropySteps: [],
+    aliveSteps: [],
+    transitions: 0,
+    cellsSolved: 0,
+    alive: 0
+  };
   FiniteAutomata.rules = FiniteAutomata.generateRules(256);
+  // FiniteAutomata.rules = FiniteAutomata.generateRules2(2, 3);
 };
 
 FiniteAutomata.prototype.draw = function () {
@@ -12,27 +21,54 @@ FiniteAutomata.prototype.draw = function () {
 
   var prevState = FiniteAutomata.generateInitialState(
     this.opts.seed,
-    this.opts.pixelSize);
+    this.opts.pixelSize,
+    this.gap);
+  // var prevState = (new Array(this.gap)).concat(prevState);
   var currentState = [];
   var rule = FiniteAutomata.rules[this.opts.ruleId];
 
-  for (var x=0; x<Size.w/this.opts.pixelSize; x++) {
-    currentState[x] = rule[FiniteAutomata.neighborhood(prevState, x)];
+  for (var x=0, xl=Size.w/this.opts.pixelSize + 2*this.gap; x<xl; x++) {
+    // currentState[x] = rule[FiniteAutomata.neighborhood(prevState, x)];
     if (prevState[x])
-      this.canvas.drawPixel(this.opts.pixelSize, x, 0, 0, 0, 0, 256);
+      this.canvas.drawPixel(this.opts.pixelSize, x-this.gap, 0, 0, 0, 0, 256);
   }
 
-  for (var y=1; y<Size.h/this.opts.pixelSize - 1; y++) {
-    for (var x=0; x<Size.w/this.opts.pixelSize; x++) {
+
+  var winSize = Size.w/this.opts.pixelSize;
+  var rXBound = winSize + this.gap;
+  this.stat.cellsSolved = rXBound - this.gap;
+  for (var y=1, yl=Size.h/this.opts.pixelSize; y<yl; y++) {
+    var entropyStep = 0;
+    var aliveStep = 0;
+    var xl=winSize + 2*this.gap;
+    for (var x=0; x<xl; x++) {
+
       currentState[x] = rule[FiniteAutomata.neighborhood(prevState, x)];
-      if (currentState[x])
-        this.canvas.drawPixel(this.opts.pixelSize, x, y, 0, 0, 0, 256);
+
+
+      if (x > this.gap && x < rXBound) {
+        if (currentState[x] !== prevState[x]) {
+          this.stat.transitions += 1;
+          entropyStep += 1;
+        }
+        this.stat.cellsSolved += 1;
+
+        if (currentState[x]) {
+          this.stat.alive += 1;
+          aliveStep += 1;
+          this.canvas.drawPixel(this.opts.pixelSize, x-this.gap, y, 0, 0, 0, 256);
+        }
+      }
     }
+    this.stat.entropySteps.push(entropyStep/winSize);
+    this.stat.aliveSteps.push(aliveStep/winSize);
     prevState = currentState;
     currentState = [];
   }
 
   this.canvas.done();
+  if (this.onDrawCallback)
+    this.onDrawCallback(this.stat);
 };
 
 FiniteAutomata.neighborhood = function (state, x) {
@@ -67,9 +103,23 @@ FiniteAutomata.generateRules = function(numOfRules) {
   return rules;
 };
 
-FiniteAutomata.generateInitialState = function(seed, pixelSize) {
+// FiniteAutomata.generateRules2 = function(states, neighbWidth) {
+//   var rules = [];
+//   var numOfRules = 256;
+//   var cases = Math.pow(states, neighbWidth);
+//   for (var i = 0; i<numOfRules; i++) {
+//     var rule = {};
+//     for (var j=0; j<cases; j++) {
+//       rule[j.toString(states)] = Math.floor(i / Math.pow(states, j)) % states;
+//     }
+//     rules.push(rule);
+//   }
+//   return rules;
+// };
+
+FiniteAutomata.generateInitialState = function(seed, pixelSize, startFrom) {
   var state = [];
-  var w = Size.w/pixelSize;
+  var w = Size.w/pixelSize+2*(startFrom||0);
 
   if (seed === 'empty')
     for (var x=0; x<w; x++) {

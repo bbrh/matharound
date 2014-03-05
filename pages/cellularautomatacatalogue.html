@@ -1,132 +1,273 @@
 <html>
 <head>
-    <title>matharound - finite automata</title>
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="/css/ma.css">
-    <script src="/js/libs/jquery.min.js"></script>
-    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
-    <script src="/js/libs/jquery.history.js"></script>
-    <script src="/js/Canvas.js"></script>
-    <script src="/js/Utils.js"></script>
-    <script src="/js/GAnalytics.js"></script>
-    <script src="/js/automata/CellularAutomata.js"></script>
-    <script src="/js/automata/CellularAutomataConstructor.js"></script>
-    <script src="/js/controls/ControlledInput.js"></script>
-    <script src="/js/controls/Dropdown.js"></script>
-    <script src="/js/controls/ControlsLib.js"></script>
-		<style type="text/css">
-			.card {
-				border: 1px solid #ddd;
-				margin: 0.5em;
-/*				padding: 0 1em;*/
-				height: 100px;
-				width: 200px;
-				display: inline-block;
-				transition: all 0.3s;
-				background-color: #FFFAF7;
-			}
+  <title>matharound - finite automata</title>
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="/css/ma.css">
+  <script src="/js/libs/jquery.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+  <script src="/js/libs/jquery.history.js"></script>
+  <script src="/js/libs/chart.min.js"></script>
+  <script src="/js/Canvas.js"></script>
+  <script src="/js/Utils.js"></script>
+  <!--<script src="/js/GAnalytics.js"></script>-->
+  <script src="/js/automata/CellularAutomata.js"></script>
+  <script src="/js/automata/CellularAutomataConstructor.js"></script>
+  <script src="/js/controls/ControlledInput.js"></script>
+  <script src="/js/controls/Dropdown.js"></script>
+  <script src="/js/controls/ControlsLib.js"></script>
+  <style type="text/css">
+    .card {
+    border: 1px solid #ccc;
+    margin: 2em 0.5em 0 0.5em;
+    display: inline-block;
+    transition: all 0.3s ease-in;
+    background-color: #FFFAF7;
+    box-shadow: 3px 3px 10px rgba(50, 50, 50, 0);
+    }
 
-			.card:hover {
-				box-shadow: 3px 3px 10px #555;
-				background-color: #fff;
-			}
+    .card-header-link {
+    padding: 0 0.5em;
+    cursor: pointer;
+    }
 
-			.card-canvas {
-				float: right;
-			}
+    .card-header-link:hover {
+    text-decoration: underline;
+    }
 
-			.card-label {
-				float:left;
-				width: 98px;
-				padding-left: 1em;
-				padding-top: 1em;
-			}
-		</style>
+    .card:hover {
+    box-shadow: 3px 3px 10px #555;
+    background-color: #fff;
+    }
+
+    .card-stat {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    float: left;    
+    }
+
+    .card-stat>li {
+    padding: 0 0.5em;
+    }
+
+    .card-stat-label {
+    display: inline-block;
+    min-width: 10em;
+    }
+
+    .card-stat-value {
+    display: inline-block;
+    text-align: right;
+    min-width: 5em;
+    }
+
+    .card-label {
+    position: relative;
+    bottom: 1.4em;
+    left: 0.5em;
+    background-color: #FFFAF7;
+    padding: 0.2em 1em;
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-bottom: 0px none #ccc;
+    font-size: 0.8em;
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+    }
+
+  </style>
 </head>
 <body>
-    <div class="content">
-        <header class="header">
-            <h1 class="page-header1"><a href="file:///C:/dev/ma2/index.html">Matharound</a></h1>
+  <div class="content">
+    <header class="header">
+      <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
 
-            <h2 class="page-subheader" style="white-space: nowrap;">
-                Cellular automata catalogue
-            </h2>
+      <h2 class="page-subheader" style="white-space: nowrap;">
+        Cellular automata catalogue
+      </h2>
 
-            <div class="control-form">
-                <span class="seed-menu control-element" style="min-width: 10em;" ></span>
-            </div>
+      <div class="control-form">
+        <span class="seed-menu control-element" style="min-width: 10em;" ></span>
+        <span class="view-mode control-element" style="min-width: 10em;" ></span>
+      </div>
 
-        </header>
+    </header>
 
-        <div class="wrap">
-            <!--<div class="canvas-container"></div>-->
-        </div>
-
-        <script type="text/javascript">
-				function getUrl (constructor, ruleId) {
-					return 'cellularautomata'+(constructor ? 'constructor' : '')+'.html?random50|'+ruleId+'|1';
-				};
-
-				function updateHash() {
-            var seed = Controls.seed.val();
-//            var ruleId = Controls.ruleid.val();
-//            var pixelSize = Controls.pixelsize.val();
-//            var neighbWidth = Controls.neighbWidth.val();
-//            var states = Controls.states.val();
-            History.replaceState({
-                seed:seed//, ruleId:ruleId, pixelSize:pixelSize, neighbWidth:neighbWidth, states:states
-            },'','?'+seed );//+'|'+ruleId+'|'+pixelSize+'|'+neighbWidth+'|'+states);
-            openpage();
-        }
-
-				function openpage () {
-            // ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
-            var state = History.getState();
-            display();
-        };
-
-				function display () {
-						Controls.container.empty();
-						var numOfRules = 256; // implement;
-						var seed = History.getState().data.seed || 'random50';
-            var fas = {};
-						Size = Utils.getCustomSize(100, 100);
-            for (var i=0; i<numOfRules; i++) {
-                var canvasContainer = $('<div>', { class: 'card' }).appendTo(Controls.container);
-								var canvasLabels = $('<div>', { class: 'card-label' }).appendTo(canvasContainer);
-								$('<a>', { text: 'Rule #'+i, style: 'display:inline-block;', href:getUrl(false, i) }
-								 	).appendTo(canvasLabels);
-								fas[i] = new FiniteAutomata(new Canvas(canvasContainer, {}, Size),
-																						{ seed:seed, pixelSize: 1, ruleId: i},
-																						Size);
-								$('<a>', { text: 'Constructor', href:getUrl(true, i) }).appendTo(canvasLabels);
-            }
-						for (ruleId in fas) {
-							fas[ruleId].draw();
-						}
-				};
-
-        $(document).ready(function() {
-						Controls = {};
-						Controls.seed = ControlsLib.automatas.seed(
-							$('.seed-menu'), updateHash
-            );
-						Controls.container = $('.wrap');
-						display();
-				});
-
-        </script>
+    <div class="wrap">
+      <!--<div class="canvas-container"></div>-->
     </div>
 
-    <footer class="footer">
-        <div class="col-sm-6 footer-column">
-            <p class="text-left">Updates on twttr</p>
-            <p class="text-left">Made by me</p>
-        </div>
-        <div class="col-sm-6 footer-column">
-            <p class="text-right">Available on GitHub</p>
-        </div>
-    </footer>
+    <div class="template-compact card">
+      <span class="card-label"></span>
+      <div class="canvas-container"></div>
+    </div>
+
+    <div class="template-full card">
+      <span class="card-label"></span>
+      <div class="canvas-container" style="float:right"></div>
+      <ul class="card-stat" style="">
+        <li>
+          <div class="card-stat-label">Entropy</div>
+          <div class="card-stat-value entropy"></div>
+          <div class="crad-color-label entropy-color-label" style="display:inline-block; width:1em; height: 1em; background-color:red;"></div>
+        </li><li>
+          <div class="card-stat-label">Total alive</div>
+          <div class="card-stat-value alive"></div>
+          <div class="crad-color-label alive-color-label" style="display:inline-block; width:1em; height: 1em; background-color:blue;"></div>
+        </li><li>
+          <div class="card-stat-label">Transmutations</div>
+          <div class="card-stat-value transmutations"></div>
+        </li><li>
+          <div class="card-stat-label">Total cells</div>
+          <div class="card-stat-value totalcells"></div>
+        </li>
+      </ul>
+      <canvas class="entropy-chart" width="400" height="200" style="float:left;"></canvas>
+
+    </div>
+
+    <script type="text/javascript">
+
+    var chartSettings = {
+      scaleOverlay : false,
+      scaleOverride : true,
+      scaleSteps : 4,
+      scaleStepWidth : 0.25,
+      scaleStartValue : 0,
+      scaleLineColor : "rgba(0,0,0,.1)",
+      scaleLineWidth : 1,
+      scaleShowLabels : true,
+      scaleShowGridLines : true,
+      scaleGridLineColor : "rgba(0,0,0,.05)",
+      scaleGridLineWidth : 1,
+      bezierCurve : false,
+      pointDot : false,
+      datasetStroke : true,
+      datasetStrokeWidth : 0,
+      datasetFill : false,
+      animation : false,
+    };
+
+    function getUrl (constructor, ruleId) {
+      return 'cellularautomata'+(constructor ? 'constructor' : '')+'.html?random50|'+ruleId+'|1';
+    };
+
+    function updateHash() {
+      var seed = Controls.seed.val() || 'point';
+      var mode = Controls.mode.val() || 'compact';
+      History.replaceState({
+        seed:seed, mode:mode
+      },'','?'+seed+'|'+mode );
+      openpage();
+    }
+
+    function openpage () {
+      // ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
+      display();
+    };
+
+    function display () {
+      Controls.container.empty();
+      var numOfRules = 256; // implement;
+      var seed = History.getState().data.seed || 'random50';
+      var fas = {};
+      var stateData = History.getState().data;
+      var template = stateData.mode == 'full' ?
+        $('.template-full') :
+        $('.template-compact');
+
+      Size = stateData.mode == 'full' ?
+        Utils.getCustomSize(200, 200) :
+        Utils.getCustomSize(200, 100);
+
+      for (var i=0; i<numOfRules; i++) {
+        var t = template.clone();
+        fas[i] = card (Controls.container, t, i, seed);
+      }
+      for (ruleId in fas) {
+        fas[ruleId].draw();
+      }
+    };
+
+    function card (container, template, ruleId, seed) {
+      var fa = new FiniteAutomata(
+      new Canvas($('.canvas-container', template), {}, Size),
+      { seed:seed, pixelSize:1, ruleId:ruleId },
+      Size);
+      var header = $('.card-label', template);
+      $('<a>', { text: 'Rule #'+ruleId, href:getUrl(false, ruleId), class: 'card-header-link' })
+      .appendTo(header);
+      $('<a>', { text: '', class:'glyphicon glyphicon-cog card-header-link', href:getUrl(true, ruleId) })
+      .appendTo(header);
+
+      var statSection = $('.card-stat', template);
+      if (statSection.length > 0) {
+        fa.onDrawCallback = function (stat) {
+          $('.entropy', template)       .text(Math.round(stat.transitions/stat.cellsSolved*1000)/1000);
+          $('.alive', template)         .text(Math.round(stat.alive/stat.cellsSolved*1000)/1000);
+          $('.transmutations', template).text(stat.transitions);
+          $('.totalcells', template)    .text(stat.cellsSolved);
+
+          var chart = $(".entropy-chart", template);
+          chart.show();
+          var ctxEntropy = chart.get(0).getContext("2d");
+          var x = [];
+          for (var i=0, di=stat.entropySteps.length; i<di; i++) x[i] = '';
+          new Chart(ctxEntropy).Line({
+            labels : x,
+            datasets : [{
+              strokeColor : "red",
+              data : stat.entropySteps
+            }, {
+              strokeColor : "blue",
+              data : stat.aliveSteps
+            }]    
+          }, chartSettings);
+        };
+      }
+
+      template.appendTo(container);
+      return fa;
+    }
+
+    $(document).ready(function() {
+      Controls = {};
+      Controls.seed = ControlsLib.automatas.seed(
+        $('.seed-menu'), updateHash
+      );
+      Controls.mode = new Dropdown($('.view-mode'),
+        'Mode', [
+        { key: 'compact', val: 'Compact' },
+        { key: 'full', val: 'Detailed' },
+        ], updateHash
+      );
+
+      var stateData = History.getState().data;
+      if (!stateData.seed) {
+        var seed = 'point';
+        var mode = 'compact';
+        History.replaceState(
+        { seed:seed, mode:mode },
+        '', '?'+seed+'|'+mode );
+      }
+
+      Controls.container = $('.wrap');
+      display();
+    });
+
+    </script>
+  </div>
+
+  <footer class="footer">
+    <div class="col-sm-6 footer-column">
+      <p class="text-left">Updates on twttr</p>
+      <p class="text-left">Made by me</p>
+    </div>
+    <div class="col-sm-6 footer-column">
+      <p class="text-right">Available on GitHub</p>
+    </div>
+  </footer>
 </body>
 </html>
