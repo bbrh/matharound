@@ -42,7 +42,7 @@
         $(document).ready(function() {
             Controls = { container : $('.canvas-container') };
             Size = Utils.getSize();
-            FA = new FiniteAutomata(new Canvas(Controls.container), Controls.menu, , Utils.getSize());
+            FA = new FiniteAutomata(new Canvas(Controls.container), Controls.menu, Utils.getSize());
             $(window).on('hashchange', openpage);
             $(window).on('resize', resize);
 
