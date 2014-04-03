@@ -1,0 +1,140 @@
+<html>
+<head>
+  <title>matharound - finite automata</title>
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="/css/ma.css">
+  <script src="/js/libs/jquery.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+  <script src="/js/libs/jquery.history.js"></script>
+  <script src="/js/Canvas.js"></script>
+  <script src="/js/Utils.js"></script>
+  <script src="/js/GAnalytics.js"></script>
+  <script src="/js/automata/CellularAutomata2.js"></script>
+  <script src="/js/controls/ControlledInput.js"></script>
+  <script src="/js/controls/Dropdown.js"></script>
+  <script src="/js/controls/ControlsLib.js"></script>
+</head>
+<body>
+  <div class="content">
+    <header class="header">
+      <h1 class="page-header1"><a href="/index.html">Matharound</a></h1>
+
+      <h2 class="page-subheader" style="white-space: nowrap;">
+        Cellular automata
+      </h2>
+
+      <div class="control-form">
+        <span class="pixel-size control-element" style="width:13em; "></span>
+        <span class="rule-add control-element" style="width:13em; "></span>
+        <span class="seed-menu control-element" style="" ></span>
+
+      </div>
+
+    </header>
+
+    <div class="wrap">
+      <div class="canvas-container"></div>
+    </div>
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+      Controls = { container : $('.canvas-container') };
+      Size = Utils.getSize();
+      FA = new CellularAutomata2(new Canvas(Controls.container), Controls.menu, Utils.getSize());
+      $(window).on('hashchange', openpage);
+      $(window).on('resize', resize);
+
+      Controls.seed = ControlsLib.automatas.seed(
+        $('.seed-menu'), updateHash
+      );
+      Controls.pixelsize = ControlsLib.automatas.pixelSize(
+        $('.pixel-size'),  updateHash
+      );
+      Controls.ruleAdd = new FloatInput(
+        $('.rule-add'), 'Add', {
+          min: 0, max: 1,
+          init: 0.1,
+          step: 0.05,
+          precision: 1e10,
+          onchange: updateHash
+        }
+      );
+
+      parseInitialUrl(location.href);
+
+      openpage();
+    });
+
+    function updateHash() {
+      var seed = Controls.seed.val();
+      var ruleAdd = Controls.ruleAdd.val();
+      var pixelSize = Controls.pixelsize.val();
+      History.replaceState({
+        seed:seed, ruleAdd:ruleAdd, pixelSize:pixelSize
+      }, '', '?'+seed+'|'+ruleAdd+'|'+pixelSize);
+      openpage();
+    }
+
+    function parseInitialUrl(a) {
+      if (a.indexOf('?') > -1) {
+        var pageAndHash = a.substring(a.indexOf('?'));
+        var pageUrl = pageAndHash.substring(1);
+        var parsed = pageUrl.split('|');
+
+        var seed = parsed[0];
+        Controls.seed.val(seed);
+
+        var ruleAdd = parseInt(parsed[1], 10);
+        Controls.ruleAdd.val(ruleAdd);
+
+        var pixelsize = parseInt(parsed[2], 10);
+        Controls.pixelsize.val(pixelsize);
+
+        History.pushState({
+          seed:seed, ruleAdd:ruleAdd, pixelSize:pixelsize
+        }, '', pageAndHash);
+      } else {
+        var ruleAdd = 0.1;
+        var pixelsize = 1;
+        var seed = 'point';
+        Controls.ruleAdd.val(ruleAdd);
+        Controls.pixelsize.val(pixelsize);
+        Controls.seed.val(seed);
+        History.replaceState({
+          seed:seed, ruleAdd:ruleAdd, pixelSize:pixelsize
+        }, '', '?'+seed+'|'+ruleAdd+'|'+pixelsize);
+      }
+      openpage();
+
+    }
+
+    function openpage () {
+      ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
+      var state = History.getState();
+      FA.opts = state.data;
+      FA.draw();
+    };
+
+    function resize () {
+      FA.cleanup();
+      Size = Utils.getSize();
+      var state = History.getState();
+      FA.opts = state.data;
+      FA.setSize(Size);
+      FA.draw();
+    }
+    </script>
+  </div>
+
+  <footer class="footer">
+    <div class="col-sm-6 footer-column">
+      <p class="text-left">Updates on twttr</p>
+      <p class="text-left">Made by me</p>
+    </div>
+    <div class="col-sm-6 footer-column">
+      <p class="text-right">Available on GitHub</p>
+    </div>
+  </footer>
+</body>
+</html>
