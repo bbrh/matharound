@@ -60,6 +60,15 @@
           onchange: updateHash
         }
       );
+      Controls.ruleNoise = new FloatInput(
+        $('.rule-noise'), 'Noise', {
+          min: 0, max: 1,
+          init: 0,
+          step: 0.05,
+          precision: 1e10,
+          onchange: updateHash
+        }
+      );
 
       parseInitialUrl(location.href);
 
@@ -69,10 +78,11 @@
     function updateHash() {
       var seed = Controls.seed.val();
       var ruleAdd = Controls.ruleAdd.val();
+      var ruleNoise = Controls.ruleNoise.val();
       var pixelSize = Controls.pixelsize.val();
       History.replaceState({
-        seed:seed, ruleAdd:ruleAdd, pixelSize:pixelSize
-      }, '', '?'+seed+'|'+ruleAdd+'|'+pixelSize);
+        seed:seed, ruleAdd:ruleAdd, ruleNoise:ruleNoise, pixelSize:pixelSize
+      }, '', '?'+seed+'|'+ruleAdd+'|'+ruleNoise+'|'+pixelSize);
       openpage();
     }
 
@@ -85,25 +95,30 @@
         var seed = parsed[0];
         Controls.seed.val(seed);
 
-        var ruleAdd = parseInt(parsed[1], 10);
+        var ruleAdd = parseFloat(parsed[1]);
         Controls.ruleAdd.val(ruleAdd);
 
-        var pixelsize = parseInt(parsed[2], 10);
+        var ruleNoise = parseFloat(parsed[2]);
+        Controls.ruleNoise.val(ruleNoise);
+
+        var pixelsize = parseInt(parsed[3], 10);
         Controls.pixelsize.val(pixelsize);
 
         History.pushState({
-          seed:seed, ruleAdd:ruleAdd, pixelSize:pixelsize
+          seed:seed, ruleAdd:ruleAdd, ruleNoise:ruleNoise, pixelSize:pixelsize
         }, '', pageAndHash);
       } else {
         var ruleAdd = 0.1;
         var pixelsize = 1;
+        var ruleNose = 0;
         var seed = 'point';
         Controls.ruleAdd.val(ruleAdd);
+        Controls.ruleNoise.val(ruleNose);
         Controls.pixelsize.val(pixelsize);
         Controls.seed.val(seed);
         History.replaceState({
-          seed:seed, ruleAdd:ruleAdd, pixelSize:pixelsize
-        }, '', '?'+seed+'|'+ruleAdd+'|'+pixelsize);
+          seed:seed, ruleAdd:ruleAdd, ruleNoise:ruleNoise, pixelSize:pixelsize
+        }, '', '?'+seed+'|'+ruleAdd+'|'+ruleNoise+'|'+pixelsize);
       }
       openpage();
 
