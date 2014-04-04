@@ -125,7 +125,7 @@ CellularAutomata2.avgSum = function (state, add, noise) {
     sum += state[i];
     i++;
   }
-  return (sum / state.length) % 1;
+  return (sum / state.length) % 1.00000000001;
 };
 
 
