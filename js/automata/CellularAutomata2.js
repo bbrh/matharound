@@ -51,7 +51,9 @@ CellularAutomata2.prototype.draw = function () {
     for (var x=0; x<xl; x++) {
 
       // currentState[x] = rule[CellularAutomata2.neighborhood(prevState, x)];
-      currentState[x] = rule(CellularAutomata2.neighborhood(prevState, x), this.opts.ruleAdd);
+      currentState[x] = rule(CellularAutomata2.neighborhood(prevState, x),
+        this.opts.ruleAdd,
+        this.opts.ruleNoise);
 
 
       if (x > this.gap && x < rXBound) {
@@ -117,8 +119,8 @@ CellularAutomata2.generateRules = function(numOfRules) {
   return rules;
 };
 
-CellularAutomata2.avgSum = function (state, add) {
-  var sum = add, i=0;
+CellularAutomata2.avgSum = function (state, add, noise) {
+  var sum = add+(Math.random()-0.5)*noise, i=0;
   while (i<state.length) {
     sum += state[i];
     i++;
