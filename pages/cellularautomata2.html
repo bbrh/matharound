@@ -12,6 +12,7 @@
   <script src="/js/GAnalytics.js"></script>
   <script src="/js/automata/CellularAutomata2.js"></script>
   <script src="/js/controls/ControlledInput.js"></script>
+  <script src="/js/controls/SaveAsImage.js"></script>
   <script src="/js/controls/Dropdown.js"></script>
   <script src="/js/controls/ControlsLib.js"></script>
 </head>
@@ -25,6 +26,7 @@
       </h2>
 
       <div class="control-form">
+        <span class="download control-element" style="width:5em; "></span>
         <span class="pixel-size control-element" style="width:13em; "></span>
         <span class="rule-add control-element" style="width:13em; "></span>
         <span class="rule-noise control-element" style="width:13em; "></span>
@@ -51,6 +53,9 @@
       );
       Controls.pixelsize = ControlsLib.automatas.pixelSize(
         $('.pixel-size'),  updateHash
+      );
+      Controls.download = new SaveAsImage(
+        $('.download'),  FA.canvas
       );
       Controls.ruleAdd = new FloatInput(
         $('.rule-add'), 'Add', {

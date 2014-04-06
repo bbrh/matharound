@@ -13,6 +13,7 @@
     <script src="/js/automata/CellularAutomata.js"></script>
     <script src="/js/automata/CellularAutomataConstructor.js"></script>
     <script src="/js/controls/ControlledInput.js"></script>
+    <script src="/js/controls/SaveAsImage.js"></script>
     <script src="/js/controls/Dropdown.js"></script>
     <script src="/js/controls/ControlsLib.js"></script>    
 </head>
@@ -26,10 +27,10 @@
             </h2>
 
             <div class="control-form">
+                <span class="download control-element" style="width:5em; "></span>
                 <span class="pixel-size control-element" style="width:13em; "></span>
                 <span class="rule-selector control-element" style="width:13em; "></span>
                 <span class="seed-menu control-element" style="" ></span>
-
             </div>
 
         </header>
@@ -55,6 +56,10 @@
             Controls.ruleid = ControlsLib.automatas.ruleId(
                 $('.rule-selector'), FA.numOfRules-1, updateHash
             );
+            Controls.download = new SaveAsImage(
+                $('.download'),  FA.canvas
+            );
+
 
             parseInitialUrl(location.href);
 

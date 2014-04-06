@@ -16,6 +16,7 @@
     <script src="/js/controls/ControlsLib.js"></script>
     <script src="/js/controls/ControlledInput.js"></script>
     <script src="/js/controls/Dropdown.js"></script>
+    <script src="/js/controls/SaveAsImage.js"></script>
     <script src="/js/GAnalytics.js"></script>
 </head>
 <body>
@@ -28,14 +29,15 @@
             </h2>
 
             <div class="control-form">
+                <span class="download control-element" style="width:5em; "></span>
                 <!--<span class="pixel-size control-element" style=" width:13em" ></span>-->
                 <span class="input-group input-group-sm control-element input-group-btn" style=" width:20em">
                     <div class=" input-group input-group-sm">
                         <!-- <div class="input-group-addon">Animation</div> -->
                         <div class="input-group-addon">zoom:</div>
-                        <input value="10" class="form-control pixel-size" type="text">
+                        <input value="10" class="form-control pixel-size" type="text" style="width:5em;">
                         <div class="input-group-addon">speed:</div>
-                        <input value="10" class="form-control anim-speed" type="text">
+                        <input value="10" class="form-control anim-speed" type="text" style="width:5em;">
                         <div class=" input-group-btn">
                             <button type="button" class="btn start-anim btn-default" data-toggle="button">
                                 <span class="glyphicon glyphicon-play"></span>
@@ -44,6 +46,7 @@
                                 <span class="glyphicon glyphicon-step-forward"></span>
                             </button>
                         </div>
+                        
                     </div>
                 </span>
 
@@ -85,7 +88,7 @@
                 game:game, seed:seed, pixelSize:pixelSize
             }, '', '?'+game+'|'+seed+'|'+pixelSize);
             openpage();
-        };
+        }
 
         function openpage () {
             // ga('send', 'pageview', '' + location.pathname + location.search  + location.hash);
@@ -111,7 +114,7 @@
             }
             g.rule = Gol.rules.constructor(state.game);
             g.draw();
-        };
+        }
 
         function dim () {
             return [
@@ -148,6 +151,10 @@
             Controls.seed = ControlsLib.gol.seed(
                 $('.seed-menu'), updateHash
             );
+            Controls.download = new SaveAsImage(
+                $('.download'),  g.canvas
+            );
+
             // Controls.pixelSize = ControlsLib.automatas.pixelSize(
             //     $('.pixel-size'),  updateHash
             // );
